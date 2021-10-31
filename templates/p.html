@@ -1,0 +1,44 @@
+<p>
+<. if p.markups.is_empty() {.>
+<.= p.text .>
+<.} else {.>
+  <. let mut cur: usize = 0; .>
+  <. for markup in &p.markups {.>
+    <.= &p.text.substring(cur, (markup.start -1) as usize) .>
+    <. cur = (markup.end + 1) as usize; .>
+    <. let text  =  &p.text.substring(markup.start as usize, markup.end as usize); .>
+    <. if markup.type_ == "A" {.>
+      <. if let Some(anchor_type) = &markup.anchor_type {.>
+        <. if anchor_type == "LINK" {.>
+          <a rel="noreferrer" href="<.= markup.href.as_ref().unwrap() .>"><.= text .></a>
+        <.} else if anchor_type == "USER" {.>
+        <a 
+          rel="noreferrer" 
+          href="https://medium.com/u/<.= markup.user_id.as_ref().unwrap() .>"
+        >
+          <.= text .>
+        </a>
+        <.} else {.>
+          <. log::error!("unknown markup.anchor_type: {:?} post id {}", anchor_type, id); .>
+          <span><.= text .></span>
+        <.}.>
+      <.}.>
+    <.} else if markup.type_ == "EM" {.>
+      <em><.= text .></em>
+    <.} else if markup.type_ == "STRONG" {.>
+      <strong><.= text .></strong>
+    <.} else if markup.type_ == "CODE" {.>
+      <code><.= text .></code>
+    <.} else {.>
+      <. log::error!("unknown markup.type_: {:?} post id {}", markup.type_, id); .>
+      <span><.= text .></span>
+    <.}.>
+
+    <. if cur < p.text.len() {.>
+      <.= p.text.slice(cur..) .>
+    <.}.>
+  <.}.>
+
+<.}.>
+</p>
+<!-- markup.type_ = [ "CODE", "A", "EM", "STRONG" -->

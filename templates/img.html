@@ -1,0 +1,9 @@
+<. let metadata = p.metadata.as_ref().unwrap(); .>
+<!-- TODO deal with layouts 
+  height="<.= metadata.original_height.>"
+  width="<.= metadata.original_width.>"
+-->
+<img
+  src="https://miro.medium.com/<.= metadata.id .>"
+  alt="<.= p.text .>"
+/>

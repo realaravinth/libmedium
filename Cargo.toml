@@ -31,7 +31,10 @@ lazy_static = "1.4"
 url = "2.2"
 
 derive_more = "0.99"
+sailfish = "0.3.2"
 
 num_cpus = "1.13"
 reqwest = { version = "0.11.6", features = ["json"] }
 graphql_client = { version = "0.10.0", features = ["reqwest"]}
+
+chrono = "0.4.19"

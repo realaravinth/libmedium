@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+use std::ops::{Bound, RangeBounds};
+
 use actix_web::{web, HttpResponse, Responder};
 use graphql_client::{reqwest::post_graphql, GraphQLQuery};
-use serde::{Deserialize, Serialize};
+use sailfish::TemplateOnce;
 
-use crate::SETTINGS;
+use crate::AppData;
 
 pub mod routes {
     pub struct Proxy {
@@ -41,6 +43,58 @@ pub mod routes {
     }
 }
 
+// credits @carlomilanesi:
+// https://users.rust-lang.org/t/how-to-get-a-substring-of-a-string/1351/11
+trait StringUtils {
+    fn substring(&self, start: usize, len: usize) -> &str;
+    fn slice(&self, range: impl RangeBounds<usize>) -> &str;
+}
+
+impl StringUtils for str {
+    fn substring(&self, start: usize, len: usize) -> &str {
+        let mut char_pos = 0;
+        let mut byte_start = 0;
+        let mut it = self.chars();
+        loop {
+            if char_pos == start {
+                break;
+            }
+            if let Some(c) = it.next() {
+                char_pos += 1;
+                byte_start += c.len_utf8();
+            } else {
+                break;
+            }
+        }
+        char_pos = 0;
+        let mut byte_end = byte_start;
+        loop {
+            if char_pos == len {
+                break;
+            }
+            if let Some(c) = it.next() {
+                char_pos += 1;
+                byte_end += c.len_utf8();
+            } else {
+                break;
+            }
+        }
+        &self[byte_start..byte_end]
+    }
+    fn slice(&self, range: impl RangeBounds<usize>) -> &str {
+        let start = match range.start_bound() {
+            Bound::Included(bound) | Bound::Excluded(bound) => *bound,
+            Bound::Unbounded => 0,
+        };
+        let len = match range.end_bound() {
+            Bound::Included(bound) => *bound + 1,
+            Bound::Excluded(bound) => *bound,
+            Bound::Unbounded => self.len(),
+        } - start;
+        self.substring(start, len)
+    }
+}
+
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "schemas/schema.graphql",
@@ -49,44 +103,39 @@ pub mod routes {
 )]
 struct GetPost;
 
+#[derive(TemplateOnce)]
+#[template(path = "index.html")]
+pub struct Post {
+    pub data: get_post::GetPostPost,
+    pub id: String,
+}
+
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.page")]
-async fn page(path: web::Path<(String, String)>) -> impl Responder {
+async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responder {
     let post_id = path.1.split("-").last();
     if post_id.is_none() {
-        return HttpResponse::BadRequest();
+        return HttpResponse::BadRequest().finish();
     }
     let id = post_id.unwrap().to_string();
 
-    let vars = get_post::Variables { id };
+    let vars = get_post::Variables { id: id.clone() };
 
     const URL: &str = "https://medium.com/_/graphql";
 
-    let client = reqwest::Client::new();
-    let res = post_graphql::<GetPost, _>(&client, URL, vars)
+    let res = post_graphql::<GetPost, _>(&data.client, URL, vars)
         .await
         .unwrap();
-    println!("{:?}", res);
-
     let response_data: get_post::ResponseData = res.data.expect("missing response data");
-    for p in response_data
-        .post
-        .unwrap()
-        .content
-        .unwrap()
-        .body_model
-        .unwrap()
-        .paragraphs
-        .unwrap()
-        .iter()
-    {
-        println!("paragraph content: {:?}", p.as_ref().unwrap());
-    }
-    //        .bodyModel
-    //        .paragraphs
-    //        .iter();
-    //    println!("{:?}", response_data);
 
+    let page = Post {
+        id,
+        data: response_data.post.unwrap(),
+    }
+    .render_once()
+    .unwrap();
     HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(page)
 }
 
 pub fn services(cfg: &mut web::ServiceConfig) {
@@ -97,42 +146,22 @@ pub fn services(cfg: &mut web::ServiceConfig) {
 mod tests {
     use actix_web::{http::StatusCode, test, App};
 
-    use crate::services;
-    use crate::*;
+    use crate::{services, Data};
 
-    use super::*;
+    #[actix_rt::test]
+    async fn deploy_update_works() {
+        let data = Data::new();
+        let app = test::init_service(App::new().app_data(data.clone()).configure(services)).await;
+        let urls = vec![
+            "/@ftrain/big-data-small-effort-b62607a43a8c",
+            "/geekculture/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
+            "/illumination/5-bugs-that-turned-into-features-e9a0e972a4e7",
+        ];
 
-    //    #[actix_rt::test]
-    //    async fn deploy_update_works() {
-    //        let app = test::init_service(App::new().configure(services)).await;
-    //
-    //        let page = page.unwrap();
-    //
-    //        let mut payload = ProxyEvent {
-    //            secret: page.secret.clone(),
-    //            branch: page.branch.clone(),
-    //        };
-    //
-    //        let resp = test::call_service(
-    //            &app,
-    //            test::TestRequest::post()
-    //                .uri(V1_API_ROUTES.deploy.update)
-    //                .set_json(&payload)
-    //                .to_request(),
-    //        )
-    //        .await;
-    //        assert_eq!(resp.status(), StatusCode::OK);
-    //
-    //        payload.secret = page.branch.clone();
-    //
-    //        let resp = test::call_service(
-    //            &app,
-    //            test::TestRequest::post()
-    //                .uri(V1_API_ROUTES.deploy.update)
-    //                .set_json(&payload)
-    //                .to_request(),
-    //        )
-    //        .await;
-    //        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
-    //    }
+        for uri in urls.iter() {
+            let resp =
+                test::call_service(&app, test::TestRequest::get().uri(uri).to_request()).await;
+            assert_eq!(resp.status(), StatusCode::OK);
+        }
+    }
 }

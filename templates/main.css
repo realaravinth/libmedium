@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  width: 60%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+p {
+  margin: 20px 0;
+}
+
+img {
+  margin: auto;
+  max-width: 80%;
+  /*! display: block; */
+}
