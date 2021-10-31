@@ -3,35 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><.= data.title .></title>
+    <title>LibMedium</title>
   </head>
   <body>
-    <main class="container">
-      <h1><.= data.title .></h1>
-      <. use chrono::{TimeZone, Utc}; .> 
-      <. let dt = Utc.timestamp_millis(data.created_at); .>
-      <p class="meta">
-        <a href="https://medium.com/u/<.= data.creator.id .>" rel="noreferrer">
-          <.= data.creator.name .></a
-        >
-        on <.= dt.format("%b %e, %Y").to_string() .>
-      </p>
-      <article>
-        <. let paragraphs = data.content.body_model.paragraphs; .>
-        <. for (pindex, p) in paragraphs.iter().enumerate() {.>
-          <. if pindex == 1 && p.type_ == "H3" {.>
-            <. continue; .>
-          <.}.>
-          <. if p.type_ == "IMG" {.>
-            <. include!("./img.html"); .> 
-          <.} else if p.type_ == "P" {.>
-            <. include!("./p.html"); .>
-          <.}.>
-        <.}.>
-      </article>
-  </main>
+    <main>
+      <div class="center">
+        <h1>LibMedium</h1>
+        <p>A free and privacy-respecting medium proxy</p>
+        <p>
+          <a
+            href="https://libmedium.batsense.net/@tylerneely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c"
+            >Demo Article</a
+          >
+          | <a href="https://github.com/realaravinth/libmedium">Source Code</a>
+        </p>
+      </div>
+    </main>
   </body>
   <style>
-  <. include!("./main.css"); .>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    body {
+      width: 100%;
+      min-height: 100vh;
+      display: block;
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 80%;
+      height: 100vh;
+      margin: auto;
+      justify-content: space-between;
+    }
+
+    .center {
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
   </style>
 </html>

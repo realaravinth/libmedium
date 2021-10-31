@@ -24,14 +24,14 @@ use crate::AppData;
 
 pub mod routes {
     pub struct Proxy {
-        pub update: &'static str,
+        pub index: &'static str,
         pub page: &'static str,
     }
 
     impl Proxy {
         pub const fn new() -> Self {
             Self {
-                update: "/api/v1/update",
+                index: "/",
                 page: "/{username}/{post}",
             }
         }
@@ -104,10 +104,19 @@ impl StringUtils for str {
 struct GetPost;
 
 #[derive(TemplateOnce)]
-#[template(path = "index.html")]
+#[template(path = "post.html")]
 pub struct Post {
     pub data: get_post::GetPostPost,
     pub id: String,
+}
+
+const INDEX: &str = include_str!("../templates/index.html");
+
+#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.index")]
+async fn index() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(INDEX)
 }
 
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.page")]
@@ -140,6 +149,7 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
 
 pub fn services(cfg: &mut web::ServiceConfig) {
     cfg.service(page);
+    cfg.service(index);
 }
 
 #[cfg(test)]
@@ -156,6 +166,7 @@ mod tests {
             "/@ftrain/big-data-small-effort-b62607a43a8c",
             "/geekculture/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
             "/illumination/5-bugs-that-turned-into-features-e9a0e972a4e7",
+            "/"
         ];
 
         for uri in urls.iter() {
