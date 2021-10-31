@@ -1,0 +1,42 @@
+query GetPost($id: ID!) {
+    post(id: $id) {
+        title
+        createdAt
+        creator { 
+            name
+            id
+        }
+        content {
+            bodyModel {
+                paragraphs {
+                    text
+                    type
+                    href
+                    layout
+                    markups {
+                        title
+                        type
+                        href
+                        userId
+                        start
+                        end
+                        anchorType
+                    }
+                    iframe {
+                        mediaResource {
+                            href
+                            iframeSrc
+                            iframeWidth
+                            iframeHeight
+                        }
+                    }
+                    metadata {
+                        id
+                        originalWidth
+                        originalHeight
+                    }
+                }
+            }
+        }
+    }
+}
