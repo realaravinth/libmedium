@@ -1,0 +1,70 @@
+name: Build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_test:
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          #- 1.51.0
+          - stable
+            #  - nightly
+
+    name: ${{ matrix.version }} - x86_64-unknown-linux-gnu
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: ⚡ Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            /var/lib/docker
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Login to DockerHub
+        if: (github.ref == 'refs/heads/master' || github.event_name == 'push') && github.repository == 'realaravinth/libmedium'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Install ${{ matrix.version }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.version }}-x86_64-unknown-linux-gnu
+          profile: minimal
+          override: true
+
+      - name: build
+        run: make
+
+      - name: run tests
+        run: make test
+
+      - name: build and publish docker images
+        run: make docker-publish
+
+      - name: generate documentation
+        if: matrix.version == 'stable' && (github.repository == 'realaravinth/libmedium')
+        run: make doc
+        env:
+          GIT_HASH: 8e77345f1597e40c2e266cb4e6dee74888918a61 # dummy value
+
+      - name: Deploy to GitHub libmedium
+        if: matrix.version == 'stable' && (github.repository == 'realaravinth/libmedium')
+        uses: JamesIves/github-libmedium-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-libmedium
+          FOLDER: target/doc
