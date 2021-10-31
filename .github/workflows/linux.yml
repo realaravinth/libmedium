@@ -63,7 +63,7 @@ jobs:
 
       - name: Deploy to GitHub libmedium
         if: matrix.version == 'stable' && (github.repository == 'realaravinth/libmedium')
-        uses: JamesIves/github-libmedium-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-libmedium
