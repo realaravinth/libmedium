@@ -14,11 +14,11 @@ doc: ## Prepare documentation
 	cargo doc --no-deps --workspace --all-features
 
 docker: ## Build docker images
-	docker build -t realaravinth/pages:master -t realaravinth/pages:latest .
+	docker build -t realaravinth/libmedium:master -t realaravinth/libmedium:latest .
 
 docker-publish: docker ## Build and publish docker images
-	docker push realaravinth/pages:master 
-	docker push realaravinth/pages:latest
+	docker push realaravinth/libmedium:master 
+	docker push realaravinth/libmedium:latest
 
 lint: ## Lint codebase
 	cargo fmt -v --all -- --emit files
