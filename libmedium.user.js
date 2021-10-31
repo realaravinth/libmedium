@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         LibMedium proxy
-// @version      0.1.1
+// @version      0.1.0
 // @description  Re-writes medium.com URLs in point to libmedium
 // @author       Aravinth Manivannan
 // @match        https://*/*
@@ -20,13 +20,14 @@ const libmediumHost = "https://libmedium.batsense.net";
   // morty has a button to go to the original site, re-writing that would be stupid
   if (!window.location.href.includes(libmediumHost)) {
     let urls = document.links;
-
+    let lib = new URL(libmediumHost);
     for (let i = 0; i < urls.length; i++) {
       blacklist.forEach((url) => {
         if (urls[i].host.includes(url)) {
-          urls[i].host = libmediumHost;
+          urls[i].host = lib.host;
         }
       });
     }
   }
 })();
+
