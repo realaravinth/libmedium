@@ -57,9 +57,9 @@ impl Settings {
             .expect("Couldn't get the number of CPUs");
 
         const CURRENT_DIR: &str = "./config/default.toml";
-        const ETC: &str = "/etc/static-pages/config.toml";
+        const ETC: &str = "/etc/libmedium/config.toml";
 
-        if let Ok(path) = env::var("ATHENA_CONFIG") {
+        if let Ok(path) = env::var("LIBMEDIUM") {
             s.merge(File::with_name(&path))?;
         } else if Path::new(CURRENT_DIR).exists() {
             // merging default config from file
