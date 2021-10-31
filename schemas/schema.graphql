@@ -7,13 +7,13 @@ schema {
 }
 
 type Paragraphs { 
-  text: String
-  type: String
+  text: String!
+  type: String!
   href: String
   layout: String
   iframe: IFrame
   metadata: MetaData
-  markups: [MarkUp ] 
+  markups: [MarkUp! ]!
 }
 
 type MarkUp {
@@ -39,24 +39,24 @@ type MediaResource{
 }
 
 type MetaData {
-  id: String
-  originalWidth: Int
-  originalHeight: Int
+  id: String!
+  originalWidth: Int!
+  originalHeight: Int!
 }
 
 
-type BodyModel { paragraphs: [Paragraphs ] }
+type BodyModel { paragraphs: [Paragraphs! ]! }
 
-type Content { bodyModel: BodyModel }
+type Content { bodyModel: BodyModel! }
 
-type User { id: String name: String }
+type User { id: String! name: String! }
 
 type Post { 
   id: ID!
-  title: String
-  createdAt: Int
-  content: Content
-  creator: User
+  title: String!
+  createdAt: Int!
+  content: Content!
+  creator: User!
 }
 
 type Data { post: Post }
