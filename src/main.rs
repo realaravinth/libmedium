@@ -23,11 +23,14 @@ use actix_web::{
 use lazy_static::lazy_static;
 use log::info;
 
+mod data;
 mod meta;
 mod proxy;
 mod routes;
 mod settings;
 
+pub use data::AppData;
+pub use data::Data;
 pub use routes::ROUTES as V1_API_ROUTES;
 pub use settings::Settings;
 
@@ -57,6 +60,8 @@ async fn main() -> std::io::Result<()> {
 
     println!("Starting server on: http://{}", SETTINGS.server.get_ip());
 
+    let data = Data::new();
+
     HttpServer::new(move || {
         App::new()
             .wrap(actix_middleware::Logger::default())
@@ -69,6 +74,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(actix_middleware::NormalizePath::new(
                 actix_middleware::TrailingSlash::Trim,
             ))
+            .app_data(data.clone())
             .configure(services)
     })
     .workers(SETTINGS.server.workers.unwrap_or_else(num_cpus::get))
