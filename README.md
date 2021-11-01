@@ -12,6 +12,17 @@
 
 </div>
 
+## Status
+
+Usable. Should you run into a `HTTP 500 Internal Server Error`, please
+file a bug report with the URL of the post you were trying to read and
+the git commit hash of the build. Git commit hash can be obtained from
+[/api/v1/meta/build](https://libmedium.batsense.net/api/v1/meta/build).
+
+This proxy works by interacting with Medium's undocumented(probably
+private but unauthenticated) API. So I've had to make assumptions and
+tweak API schematics as I run into errors.
+
 ## Why?
 
 Knowledge is the true wealth of humanity. If it weren't for our
@@ -27,6 +38,29 @@ respecting freedom. [LWN.net](https://lwn.net) is one of my favourite
 publications that has been around forever. So it is possible. I hope
 medium.com comes up with other, non-harmful ways to run a sustainable
 business.
+
+## Deploy
+
+1. Grab [`./config/default.toml`](./config/default.toml) and make
+   necessary changes
+
+2. AMD64 pre-compiled images are available on DockerHub.
+
+```
+docker run -d \
+  -v ./config/default.toml:/etc/libmedium/config.toml \
+  -p 8082:7000 \
+  --restart always \
+  --name libmedium \
+  realaravinth/libmedium
+```
+
+If you are on a different architecture, run make docker and then run the
+above command.
+
+```
+make docker
+```
 
 ---
 
