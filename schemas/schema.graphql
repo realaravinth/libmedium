@@ -40,8 +40,8 @@ type MediaResource{
 
 type MetaData {
   id: String!
-  originalWidth: Int!
-  originalHeight: Int!
+  originalWidth: Int
+  originalHeight: Int
 }
 
 
