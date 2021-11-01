@@ -23,5 +23,14 @@ p {
 img {
   margin: auto;
   max-width: 80%;
-  /*! display: block; */
+}
+
+@media screen and (max-width: 1200px) {
+  main {
+    width: 90%;
+  }
+
+  img {
+    display: block;
+  }
 }
