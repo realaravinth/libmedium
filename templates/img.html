@@ -1,10 +1,7 @@
 <. let metadata = p.metadata.as_ref().unwrap(); .>
-<!-- TODO deal with layouts 
-  height="<.# metadata.original_height.>"
-  width="<.# metadata.original_width.>"
--->
-
 <figure>
-  <img src="<.= crate::V1_API_ROUTES.proxy.get_medium_asset(&metadata.id).>" />
+  <img 
+  width="<.= metadata.original_width.as_ref().unwrap() .>"
+  src="<.= crate::V1_API_ROUTES.proxy.get_medium_asset(&metadata.id).>" />
   <figcaption><.= p.text .></figcaption>
 </figure>

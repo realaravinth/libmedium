@@ -4,7 +4,9 @@
 <.} else {.>
   <. let mut cur: usize = 0; .>
   <. for markup in &p.markups {.>
+  <. if markup.start != 0 {.>
     <.= &p.text.substring(cur, (markup.start -1) as usize) .>
+  <.}.>
     <. cur = (markup.end + 1) as usize; .>
     <. let text  =  &p.text.slice(markup.start as usize..markup.end as usize); .>
     <. if markup.type_ == "A" {.>
