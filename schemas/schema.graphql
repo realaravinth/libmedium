@@ -53,6 +53,7 @@ type User { id: String! name: String! imageId: String! }
 
 type Post { 
   id: ID!
+  readingTime: Float!
   title: String!
   createdAt: Int!
   content: Content!

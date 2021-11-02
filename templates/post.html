@@ -20,7 +20,7 @@
           />
           <.= data.creator.name .></a
         >
-        on <.= &date .>
+        on <.= &date .> &#183; <.= data.reading_time.floor() as usize .> min read
       </p>
       <article>
         <. let paragraphs = data.content.body_model.paragraphs; .>
@@ -42,6 +42,9 @@
             <h5><.= p.text .></h5>
           <.} else if p.type_ == "H6" {.>
             <h6><.= p.text .></h6>
+          <.} else if p.type_ == "IFRAME" {.>
+            <. let src = &p.iframe.as_ref().unwrap().media_resource.as_ref().unwrap().href; .>
+              <iframe src="<.= src .>" frameborder="0"></iframe>
           <.}.>
         <.}.>
       </article>

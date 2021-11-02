@@ -123,17 +123,20 @@ async fn index() -> impl Responder {
 
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.asset")]
 async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
-    println!("asset name: {}", path);
     let res = data
         .client
         .get(format!("https://miro.medium.com/{}", path))
         .send()
         .await
         .unwrap();
-    print!("got res");
     let headers = res.headers();
     let content_type = headers.get(CONTENT_TYPE).unwrap();
     HttpResponse::Ok()
+        .insert_header(header::CacheControl(vec![
+            header::CacheDirective::Public,
+            header::CacheDirective::Extension("immutable".into(), None),
+            header::CacheDirective::MaxAge(CACHE_AGE),
+        ]))
         .content_type(content_type)
         .body(res.bytes().await.unwrap())
 }
@@ -153,11 +156,6 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
     .render_once()
     .unwrap();
     HttpResponse::Ok()
-        .insert_header(header::CacheControl(vec![
-            header::CacheDirective::Public,
-            header::CacheDirective::Extension("immutable".into(), None),
-            header::CacheDirective::MaxAge(CACHE_AGE),
-        ]))
         .content_type("text/html; charset=utf-8")
         .body(page)
 }

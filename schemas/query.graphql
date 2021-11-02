@@ -2,6 +2,7 @@ query GetPost($id: ID!) {
     post(id: $id) {
         title
         createdAt
+        readingTime
         creator { 
             name
             id
