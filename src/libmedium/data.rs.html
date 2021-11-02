@@ -73,6 +73,29 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -94,9 +117,12 @@
 <span class="kw">use</span> <span class="ident">actix_web::web</span>;
 <span class="kw">use</span> <span class="ident">graphql_client</span>::{<span class="ident">reqwest::post_graphql</span>, <span class="ident">GraphQLQuery</span>};
 <span class="kw">use</span> <span class="ident">reqwest::Client</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">sled</span>::{<span class="ident">Db</span>, <span class="ident">Tree</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SETTINGS</span>;
+
+<span class="kw">const</span> <span class="ident">CACHE_VERSION</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Data</span> {
@@ -122,11 +148,31 @@
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">SETTINGS</span>.<span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()).<span class="ident">join</span>(<span class="string">&quot;posts_cache&quot;</span>);
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">sled::open</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">posts</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">open_tree</span>(<span class="string">&quot;posts&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="ident">AppData::new</span>(<span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">client</span>: <span class="ident">Client::new</span>(),
             <span class="ident">cache</span>,
             <span class="ident">posts</span>,
-        })
+        };
+        <span class="ident">res</span>.<span class="ident">migrate</span>();
+
+        <span class="ident">AppData::new</span>(<span class="ident">res</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">migrate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">const</span> <span class="ident">KEY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;POST_CACHE_VERSION&quot;</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clean</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">posts</span>.<span class="ident">get</span>(<span class="ident">KEY</span>) {
+            <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">unwrap</span>();
+            <span class="ident">clean</span> <span class="op">=</span> <span class="op">!</span>(<span class="ident">version</span> <span class="op">=</span><span class="op">=</span> <span class="ident">CACHE_VERSION</span>);
+        }
+
+        <span class="kw">if</span> <span class="ident">clean</span> {
+            <span class="self">self</span>.<span class="ident">posts</span>.<span class="ident">clear</span>().<span class="ident">unwrap</span>();
+            <span class="self">self</span>.<span class="ident">posts</span>.<span class="ident">flush</span>().<span class="ident">unwrap</span>();
+            <span class="self">self</span>.<span class="ident">posts</span>
+                .<span class="ident">insert</span>(<span class="ident">KEY</span>, <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">CACHE_VERSION</span>).<span class="ident">unwrap</span>())
+                .<span class="ident">unwrap</span>();
+        }
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PostResp</span> {
