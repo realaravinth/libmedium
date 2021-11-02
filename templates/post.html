@@ -10,7 +10,6 @@
       <. use chrono::{TimeZone, Utc}; .> 
       <. let dt = Utc.timestamp_millis(data.created_at); .>
       <. let date = dt.format("%b %e, %Y").to_string(); .>
-
       <h1><.= data.title .></h1>
       <p class="meta">
         <a class="author" href="https://medium.com/u/<.= data.creator.id .>" rel="noreferrer">
@@ -29,8 +28,6 @@
           <. if pindex == 0 && p.type_ == "H3" {.>
             <. continue; .>
           <.}.>
-
-
          <. if p.type_ == "IMG" {.>
             <. include!("./img.html"); .> 
           <.} else if p.type_ == "P" {.>
@@ -46,8 +43,6 @@
           <.} else if p.type_ == "H6" {.>
             <h6><.= p.text .></h6>
           <.}.>
-
-
         <.}.>
       </article>
   </main>

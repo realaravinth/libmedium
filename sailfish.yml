@@ -1,1 +1,3 @@
 delimiter: "."
+optimization:
+    rm_whitespace: true

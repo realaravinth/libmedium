@@ -17,9 +17,9 @@
 use std::ops::{Bound, RangeBounds};
 
 use actix_web::{web, HttpResponse, Responder};
-use graphql_client::{reqwest::post_graphql, GraphQLQuery};
 use sailfish::TemplateOnce;
 
+use crate::data::PostResp;
 use crate::AppData;
 
 pub mod routes {
@@ -95,18 +95,11 @@ impl StringUtils for str {
     }
 }
 
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "schemas/schema.graphql",
-    query_path = "schemas/query.graphql",
-    response_derives = "Debug"
-)]
-struct GetPost;
-
 #[derive(TemplateOnce)]
 #[template(path = "post.html")]
+#[template(rm_whitespace = true)]
 pub struct Post {
-    pub data: get_post::GetPostPost,
+    pub data: PostResp,
     pub id: String,
 }
 
@@ -125,20 +118,11 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
     if post_id.is_none() {
         return HttpResponse::BadRequest().finish();
     }
-    let id = post_id.unwrap().to_string();
-
-    let vars = get_post::Variables { id: id.clone() };
-
-    const URL: &str = "https://medium.com/_/graphql";
-
-    let res = post_graphql::<GetPost, _>(&data.client, URL, vars)
-        .await
-        .unwrap();
-    let response_data: get_post::ResponseData = res.data.expect("missing response data");
+    let id = post_id.unwrap();
 
     let page = Post {
-        id,
-        data: response_data.post.unwrap(),
+        id: id.to_owned(),
+        data: data.get_post(&id).await,
     }
     .render_once()
     .unwrap();
