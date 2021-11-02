@@ -7,22 +7,31 @@
   </head>
   <body>
     <main class="container">
-      <h1><.= data.title .></h1>
       <. use chrono::{TimeZone, Utc}; .> 
       <. let dt = Utc.timestamp_millis(data.created_at); .>
+      <. let date = dt.format("%b %e, %Y").to_string(); .>
+
+      <h1><.= data.title .></h1>
       <p class="meta">
-        <a href="https://medium.com/u/<.= data.creator.id .>" rel="noreferrer">
+        <a class="author" href="https://medium.com/u/<.= data.creator.id .>" rel="noreferrer">
+          <img 
+            src="https://miro.medium.com/<.= data.creator.image_id .>"
+            class="author__photo"
+            alt="<.= data.creator.name .>"
+          />
           <.= data.creator.name .></a
         >
-        on <.= dt.format("%b %e, %Y").to_string() .>
+        on <.= &date .>
       </p>
       <article>
         <. let paragraphs = data.content.body_model.paragraphs; .>
         <. for (pindex, p) in paragraphs.iter().enumerate() {.>
-          <. if pindex == 1 && p.type_ == "H3" {.>
+          <. if pindex == 0 && p.type_ == "H3" {.>
             <. continue; .>
           <.}.>
-          <. if p.type_ == "IMG" {.>
+
+
+         <. if p.type_ == "IMG" {.>
             <. include!("./img.html"); .> 
           <.} else if p.type_ == "P" {.>
             <. include!("./p.html"); .>
@@ -37,6 +46,8 @@
           <.} else if p.type_ == "H6" {.>
             <h6><.= p.text .></h6>
           <.}.>
+
+
         <.}.>
       </article>
   </main>

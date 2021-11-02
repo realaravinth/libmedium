@@ -5,6 +5,7 @@ query GetPost($id: ID!) {
         creator { 
             name
             id
+			imageId
         }
         content {
             bodyModel {
