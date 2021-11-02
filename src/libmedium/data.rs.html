@@ -68,6 +68,11 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -84,10 +89,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
  */</span>
+<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+
 <span class="kw">use</span> <span class="ident">actix_web::web</span>;
 <span class="kw">use</span> <span class="ident">graphql_client</span>::{<span class="ident">reqwest::post_graphql</span>, <span class="ident">GraphQLQuery</span>};
 <span class="kw">use</span> <span class="ident">reqwest::Client</span>;
 <span class="kw">use</span> <span class="ident">sled</span>::{<span class="ident">Db</span>, <span class="ident">Tree</span>};
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SETTINGS</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Data</span> {
@@ -110,7 +119,8 @@
 
 <span class="kw">impl</span> <span class="ident">Data</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AppData</span> {
-        <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">sled::open</span>(<span class="string">&quot;posts_cache&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">SETTINGS</span>.<span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()).<span class="ident">join</span>(<span class="string">&quot;posts_cache&quot;</span>);
+        <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">sled::open</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">posts</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">open_tree</span>(<span class="string">&quot;posts&quot;</span>).<span class="ident">unwrap</span>();
         <span class="ident">AppData::new</span>(<span class="self">Self</span> {
             <span class="ident">client</span>: <span class="ident">Client::new</span>(),
