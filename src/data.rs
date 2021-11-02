@@ -19,9 +19,12 @@ use std::path::Path;
 use actix_web::web;
 use graphql_client::{reqwest::post_graphql, GraphQLQuery};
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 use sled::{Db, Tree};
 
 use crate::SETTINGS;
+
+const CACHE_VERSION: usize = 1;
 
 #[derive(Clone)]
 pub struct Data {
@@ -47,11 +50,31 @@ impl Data {
         let path = Path::new(SETTINGS.cache.as_ref().unwrap()).join("posts_cache");
         let cache = sled::open(path).unwrap();
         let posts = cache.open_tree("posts").unwrap();
-        AppData::new(Self {
+        let res = Self {
             client: Client::new(),
             cache,
             posts,
-        })
+        };
+        res.migrate();
+
+        AppData::new(res)
+    }
+
+    fn migrate(&self) {
+        const KEY: &str = "POST_CACHE_VERSION";
+        let mut clean = true;
+        if let Ok(Some(v)) = self.posts.get(KEY) {
+            let version = bincode::deserialize::<usize>(&v[..]).unwrap();
+            clean = !(version == CACHE_VERSION);
+        }
+
+        if clean {
+            self.posts.clear().unwrap();
+            self.posts.flush().unwrap();
+            self.posts
+                .insert(KEY, bincode::serialize(&CACHE_VERSION).unwrap())
+                .unwrap();
+        }
     }
 
     pub async fn get_post(&self, id: &str) -> PostResp {
