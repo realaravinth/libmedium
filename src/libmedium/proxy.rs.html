@@ -191,8 +191,6 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -318,17 +316,20 @@
 
 <span class="attribute">#[<span class="ident">my_codegen::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.asset&quot;</span>)]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">assets</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Responder</span> {
-    <span class="macro">println!</span>(<span class="string">&quot;asset name: {}&quot;</span>, <span class="ident">path</span>);
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">data</span>
         .<span class="ident">client</span>
         .<span class="ident">get</span>(<span class="macro">format!</span>(<span class="string">&quot;https://miro.medium.com/{}&quot;</span>, <span class="ident">path</span>))
         .<span class="ident">send</span>()
         .<span class="kw">await</span>
         .<span class="ident">unwrap</span>();
-    <span class="macro">print!</span>(<span class="string">&quot;got res&quot;</span>);
     <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers</span>();
     <span class="kw">let</span> <span class="ident">content_type</span> <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">get</span>(<span class="ident">CONTENT_TYPE</span>).<span class="ident">unwrap</span>();
     <span class="ident">HttpResponse::Ok</span>()
+        .<span class="ident">insert_header</span>(<span class="ident">header::CacheControl</span>(<span class="macro">vec!</span>[
+            <span class="ident">header::CacheDirective::Public</span>,
+            <span class="ident">header::CacheDirective::Extension</span>(<span class="string">&quot;immutable&quot;</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>),
+            <span class="ident">header::CacheDirective::MaxAge</span>(<span class="ident">CACHE_AGE</span>),
+        ]))
         .<span class="ident">content_type</span>(<span class="ident">content_type</span>)
         .<span class="ident">body</span>(<span class="ident">res</span>.<span class="ident">bytes</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>())
 }
@@ -348,11 +349,6 @@
     .<span class="ident">render_once</span>()
     .<span class="ident">unwrap</span>();
     <span class="ident">HttpResponse::Ok</span>()
-        .<span class="ident">insert_header</span>(<span class="ident">header::CacheControl</span>(<span class="macro">vec!</span>[
-            <span class="ident">header::CacheDirective::Public</span>,
-            <span class="ident">header::CacheDirective::Extension</span>(<span class="string">&quot;immutable&quot;</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>),
-            <span class="ident">header::CacheDirective::MaxAge</span>(<span class="ident">CACHE_AGE</span>),
-        ]))
         .<span class="ident">content_type</span>(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
         .<span class="ident">body</span>(<span class="ident">page</span>)
 }
