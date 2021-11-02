@@ -16,16 +16,20 @@
  */
 use std::ops::{Bound, RangeBounds};
 
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{http::header, web, HttpResponse, Responder};
+use reqwest::header::CONTENT_TYPE;
 use sailfish::TemplateOnce;
 
 use crate::data::PostResp;
 use crate::AppData;
 
+const CACHE_AGE: u32 = 60 * 60 * 24;
+
 pub mod routes {
     pub struct Proxy {
         pub index: &'static str,
         pub page: &'static str,
+        pub asset: &'static str,
     }
 
     impl Proxy {
@@ -33,12 +37,17 @@ pub mod routes {
             Self {
                 index: "/",
                 page: "/{username}/{post}",
+                asset: "/asset/medium/{name}",
             }
         }
         pub fn get_page(&self, username: &str, post: &str) -> String {
             self.page
                 .replace("{username}", username)
                 .replace("{post}", post)
+        }
+
+        pub fn get_medium_asset(&self, asset_name: &str) -> String {
+            self.asset.replace("{name}", asset_name)
         }
     }
 }
@@ -112,9 +121,26 @@ async fn index() -> impl Responder {
         .body(INDEX)
 }
 
+#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.asset")]
+async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
+    println!("asset name: {}", path);
+    let res = data
+        .client
+        .get(format!("https://miro.medium.com/{}", path))
+        .send()
+        .await
+        .unwrap();
+    print!("got res");
+    let headers = res.headers();
+    let content_type = headers.get(CONTENT_TYPE).unwrap();
+    HttpResponse::Ok()
+        .content_type(content_type)
+        .body(res.bytes().await.unwrap())
+}
+
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.page")]
 async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responder {
-    let post_id = path.1.split("-").last();
+    let post_id = path.1.split('-').last();
     if post_id.is_none() {
         return HttpResponse::BadRequest().finish();
     }
@@ -122,16 +148,22 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
 
     let page = Post {
         id: id.to_owned(),
-        data: data.get_post(&id).await,
+        data: data.get_post(id).await,
     }
     .render_once()
     .unwrap();
     HttpResponse::Ok()
+        .insert_header(header::CacheControl(vec![
+            header::CacheDirective::Public,
+            header::CacheDirective::Extension("immutable".into(), None),
+            header::CacheDirective::MaxAge(CACHE_AGE),
+        ]))
         .content_type("text/html; charset=utf-8")
         .body(page)
 }
 
 pub fn services(cfg: &mut web::ServiceConfig) {
+    cfg.service(assets);
     cfg.service(page);
     cfg.service(index);
 }
@@ -150,7 +182,8 @@ mod tests {
             "/@ftrain/big-data-small-effort-b62607a43a8c",
             "/geekculture/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
             "/illumination/5-bugs-that-turned-into-features-e9a0e972a4e7",
-            "/"
+            "/",
+            "/asset/medium/1*LY2ohYsNa9nOV1Clko3zJA.png",
         ];
 
         for uri in urls.iter() {
