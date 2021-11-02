@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Data",""]],"type":[["AppData",""]]});
+initSidebarItems({"mod":[["get_post",""]],"struct":[["Data",""],["GetPost",""]],"type":[["AppData",""],["PostResp",""]]});

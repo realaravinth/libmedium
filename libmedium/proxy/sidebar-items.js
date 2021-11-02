@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["INDEX",""]],"fn":[["services",""]],"mod":[["get_post",""],["routes",""]],"struct":[["GetPost",""],["Post",""],["index",""],["page",""]],"trait":[["StringUtils",""]]});
+initSidebarItems({"constant":[["INDEX",""]],"fn":[["services",""]],"mod":[["routes",""]],"struct":[["Post",""],["index",""],["page",""]],"trait":[["StringUtils",""]]});
