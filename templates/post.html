@@ -26,12 +26,22 @@
             <. include!("./img.html"); .> 
           <.} else if p.type_ == "P" {.>
             <. include!("./p.html"); .>
+          <.} else if p.type_ == "H2" {.>
+            <h2><.= p.text .></h2>
+          <.} else if p.type_ == "H3" {.>
+            <h3><.= p.text .></h3>
+          <.} else if p.type_ == "H4" {.>
+            <h4><.= p.text .></h4>
+          <.} else if p.type_ == "H5" {.>
+            <h5><.= p.text .></h5>
+          <.} else if p.type_ == "H6" {.>
+            <h6><.= p.text .></h6>
           <.}.>
         <.}.>
       </article>
   </main>
   </body>
   <style>
-  <. include!("./main.css"); .>
+    <. include!("./main.css"); .>
   </style>
 </html>
