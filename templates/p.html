@@ -6,7 +6,8 @@
   <. for markup in &p.markups {.>
     <.= &p.text.substring(cur, (markup.start -1) as usize) .>
     <. cur = (markup.end + 1) as usize; .>
-    <. let text  =  &p.text.substring(markup.start as usize, markup.end as usize); .>
+    <. let text  =  &p.text.slice(markup.start as usize..markup.end as usize); .>
+    <. println!("{}", text); .>
     <. if markup.type_ == "A" {.>
       <. if let Some(anchor_type) = &markup.anchor_type {.>
         <. if anchor_type == "LINK" {.>
@@ -33,10 +34,10 @@
       <. log::error!("unknown markup.type_: {:?} post id {}", markup.type_, id); .>
       <span><.= text .></span>
     <.}.>
+  <.}.>
 
-    <. if cur < p.text.len() {.>
-      <.= p.text.slice(cur..) .>
-    <.}.>
+  <. if cur < p.text.len() {.>
+    <.= p.text.slice(cur..) .>
   <.}.>
 
 <.}.>
