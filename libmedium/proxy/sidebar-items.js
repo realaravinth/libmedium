@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["INDEX",""]],"fn":[["services",""]],"mod":[["routes",""]],"struct":[["Post",""],["index",""],["page",""]],"trait":[["StringUtils",""]]});
+initSidebarItems({"constant":[["CACHE_AGE",""],["INDEX",""]],"fn":[["services",""]],"mod":[["routes",""]],"struct":[["Post",""],["assets",""],["index",""],["page",""]],"trait":[["StringUtils",""]]});
