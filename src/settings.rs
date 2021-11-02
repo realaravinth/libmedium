@@ -42,7 +42,7 @@ impl Server {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Settings {
     pub debug: bool,
-    pub cache: String,
+    pub cache: Option<String>,
     pub server: Server,
     pub source_code: String,
 }
@@ -82,14 +82,26 @@ impl Settings {
             Err(e) => warn!("couldn't interpret PORT: {}", e),
         }
 
-        let settings: Settings = s.try_into()?;
+        let mut settings: Settings = s.try_into()?;
 
-        let cache_path = Path::new(&settings.cache);
+        if settings.cache.is_none() {
+            let tmp = env::temp_dir().join("libmedium_cache_path");
+            if !tmp.exists() {
+                fs::create_dir_all(&tmp).unwrap()
+            }
+            settings.cache = Some(tmp.to_str().unwrap().to_string())
+        }
+
+        let cache_path = settings.cache.as_ref().unwrap();
+        let cache_path = Path::new(&cache_path);
         if !cache_path.exists() {
             fs::create_dir(&cache_path).unwrap();
         }
         if !cache_path.is_dir() {
-            panic!("Cache path {} must be a directory", &settings.cache);
+            panic!(
+                "Cache path {} must be a directory",
+                &settings.cache.as_ref().unwrap()
+            );
         }
         Ok(settings)
     }

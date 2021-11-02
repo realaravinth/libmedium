@@ -44,7 +44,7 @@ pub type AppData = web::Data<Data>;
 
 impl Data {
     pub fn new() -> AppData {
-        let path = Path::new(&SETTINGS.cache).join("posts_cache");
+        let path = Path::new(SETTINGS.cache.as_ref().unwrap()).join("posts_cache");
         let cache = sled::open(path).unwrap();
         let posts = cache.open_tree("posts").unwrap();
         AppData::new(Self {
