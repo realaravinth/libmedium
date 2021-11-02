@@ -3,6 +3,36 @@
   padding: 0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Times New Roman", Times, serif;
+}
+
+a {
+  color: rgb(0, 86, 179);
+  text-decoration: none;
+}
+
+a:visited {
+  color: rgb(0, 86, 179);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+html {
+  color: #333;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  /*  font-size: 1.25rem; */
+  font-size: 18px;
+  line-height: 1.55rem;
+}
+
 body {
   width: 100%;
   display: flex;
@@ -10,7 +40,7 @@ body {
 }
 
 main {
-  width: 60%;
+  width: 35em;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -23,9 +53,19 @@ p {
 img {
   margin: auto;
   max-width: 80%;
+  display: block;
+}
+
+code {
+  font-family: monospace;
+  font-size: 15px;
 }
 
 @media screen and (max-width: 1200px) {
+  html {
+    font-size: 1rem;
+    line-height: 1.34rem;
+  }
   main {
     width: 90%;
   }

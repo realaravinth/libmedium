@@ -23,5 +23,5 @@ fn main() {
         .expect("error in git command, is git installed?");
     let git_hash = String::from_utf8(output.stdout).unwrap();
     println!("cargo:rustc-env=GIT_HASH={}", git_hash);
-    println!("cargo:rerun-if-changed=src/schema2.graphql");
+    println!("cargo:rerun-if-changed=src/schema2.graphql,templates/main.css");
 }
