@@ -1,5 +1,6 @@
 debug = true
 source_code = "https://github.com/realaravinth/libmedium"
+cache = "/var/lib/libmedium"
 
 [server]
 # The port at which you want authentication to listen to

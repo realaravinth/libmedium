@@ -14,10 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+use std::path::Path;
+
 use actix_web::web;
 use graphql_client::{reqwest::post_graphql, GraphQLQuery};
 use reqwest::Client;
 use sled::{Db, Tree};
+
+use crate::SETTINGS;
 
 #[derive(Clone)]
 pub struct Data {
@@ -40,7 +44,8 @@ pub type AppData = web::Data<Data>;
 
 impl Data {
     pub fn new() -> AppData {
-        let cache = sled::open("posts_cache").unwrap();
+        let path = Path::new(&SETTINGS.cache).join("posts_cache");
+        let cache = sled::open(path).unwrap();
         let posts = cache.open_tree("posts").unwrap();
         AppData::new(Self {
             client: Client::new(),

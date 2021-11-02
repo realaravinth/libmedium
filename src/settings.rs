@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 use std::env;
+use std::fs;
 use std::path::Path;
 
 use config::{Config, ConfigError, Environment, File};
@@ -41,7 +42,7 @@ impl Server {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Settings {
     pub debug: bool,
-    //    pub database: Database,
+    pub cache: String,
     pub server: Server,
     pub source_code: String,
 }
@@ -83,6 +84,13 @@ impl Settings {
 
         let settings: Settings = s.try_into()?;
 
+        let cache_path = Path::new(&settings.cache);
+        if !cache_path.exists() {
+            fs::create_dir(&cache_path).unwrap();
+        }
+        if !cache_path.is_dir() {
+            panic!("Cache path {} must be a directory", &settings.cache);
+        }
         Ok(settings)
     }
 }
