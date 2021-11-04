@@ -44,7 +44,12 @@
             <h6><.= p.text .></h6>
           <.} else if p.type_ == "IFRAME" {.>
             <. let src = &p.iframe.as_ref().unwrap().media_resource.as_ref().unwrap().href; .>
+            <. if src.contains("gist.github.com"){.>
+              <iframe src="<.= crate::V1_API_ROUTES.proxy.get_gist(&src) .>" frameborder="0"></iframe>
+              <a href="<.= src .>">Click here to open gist on GitHub</a>
+            <.} else {.>
               <iframe src="<.= src .>" frameborder="0"></iframe>
+            <.}.>
           <.}.>
         <.}.>
       </article>

@@ -17,8 +17,9 @@
 use std::ops::{Bound, RangeBounds};
 
 use actix_web::{http::header, web, HttpResponse, Responder};
-use reqwest::header::CONTENT_TYPE;
+use reqwest::header::{CONTENT_TYPE, USER_AGENT};
 use sailfish::TemplateOnce;
+use serde::{Deserialize, Serialize};
 
 use crate::data::PostResp;
 use crate::AppData;
@@ -30,6 +31,7 @@ pub mod routes {
         pub index: &'static str,
         pub page: &'static str,
         pub asset: &'static str,
+        pub gist: &'static str,
     }
 
     impl Proxy {
@@ -38,6 +40,7 @@ pub mod routes {
                 index: "/",
                 page: "/{username}/{post}",
                 asset: "/asset/medium/{name}",
+                gist: "/asset/github-gist",
             }
         }
         pub fn get_page(&self, username: &str, post: &str) -> String {
@@ -48,6 +51,14 @@ pub mod routes {
 
         pub fn get_medium_asset(&self, asset_name: &str) -> String {
             self.asset.replace("{name}", asset_name)
+        }
+
+        pub fn get_gist(&self, url: &str) -> String {
+            if let Some(gist_id) = url.split('/').last() {
+                format!("{}?gist={}", self.gist, urlencoding::encode(gist_id))
+            } else {
+                url.to_owned()
+            }
         }
     }
 }
@@ -141,6 +152,104 @@ async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
         .body(res.bytes().await.unwrap())
 }
 
+#[derive(Deserialize, Serialize)]
+struct GistQuery {
+    gist: String,
+}
+
+#[derive(Deserialize, Serialize, TemplateOnce)]
+#[template(path = "gist.html")]
+#[template(rm_whitespace = true)]
+pub struct GistContent {
+    pub files: Vec<GistFile>,
+    pub html_url: String,
+}
+
+#[derive(TemplateOnce)]
+#[template(path = "gist_error.html")]
+#[template(rm_whitespace = true)]
+pub struct GistContentError;
+
+#[derive(Deserialize, Serialize)]
+pub struct GistFile {
+    pub file_name: String,
+    pub content: String,
+    pub language: String,
+    pub raw_url: String,
+}
+
+impl GistFile {
+    pub fn get_html_content(&self) -> String {
+        let mut content = self.content.as_str();
+        if self.content.starts_with('"') {
+            content = self.content.slice(1..);
+        }
+
+        if content.ends_with('"') {
+            content = content.slice(..content.len() - 1);
+        }
+        content.replace("\\t", "  ")
+    }
+}
+
+#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.gist")]
+async fn get_gist(query: web::Query<GistQuery>, data: AppData) -> impl Responder {
+    const URL: &str = "https://api.github.com/gists/";
+    let url = format!("{}{}", URL, query.gist);
+
+    let resp = data
+        .client
+        .get(&url)
+        .header(USER_AGENT, "libmedium")
+        .send()
+        .await
+        .unwrap()
+        .json::<serde_json::Value>()
+        .await
+        .unwrap();
+    if let Some(files) = resp.get("files") {
+        if let serde_json::Value::Object(v) = files {
+            let mut files = Vec::with_capacity(v.len());
+            v.iter().for_each(|(name, file_obj)| {
+                let file = GistFile {
+                    file_name: name.to_string(),
+                    content: file_obj
+                        .get("content")
+                        .unwrap()
+                        .as_str()
+                        .unwrap()
+                        .to_owned(),
+                    language: file_obj
+                        .get("language")
+                        .unwrap()
+                        .as_str()
+                        .unwrap()
+                        .to_owned(),
+                    raw_url: file_obj
+                        .get("raw_url")
+                        .unwrap()
+                        .as_str()
+                        .unwrap()
+                        .to_owned(),
+                };
+                files.push(file);
+            });
+            let gist = GistContent {
+                files,
+                html_url: resp.get("html_url").unwrap().to_string(),
+            };
+
+            return HttpResponse::Ok()
+                .content_type("text/html")
+                .body(gist.render_once().unwrap());
+        }
+    };
+    let err = GistContentError {};
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(err.render_once().unwrap())
+}
+
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.page")]
 async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responder {
     let post_id = path.1.split('-').last();
@@ -162,6 +271,7 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
 
 pub fn services(cfg: &mut web::ServiceConfig) {
     cfg.service(assets);
+    cfg.service(get_gist);
     cfg.service(page);
     cfg.service(index);
 }
