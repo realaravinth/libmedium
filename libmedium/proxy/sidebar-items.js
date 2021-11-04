@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["CACHE_AGE",""],["INDEX",""]],"fn":[["services",""]],"mod":[["routes",""]],"struct":[["GistContent",""],["GistContentError",""],["GistFile",""],["GistQuery",""],["Post",""],["assets",""],["get_gist",""],["index",""],["page",""]],"trait":[["StringUtils",""]]});
+initSidebarItems({"constant":[["CACHE_AGE",""],["INDEX",""]],"fn":[["services",""]],"mod":[["routes",""]],"struct":[["Post",""],["assets",""],["index",""],["page",""]],"trait":[["StringUtils",""]]});
