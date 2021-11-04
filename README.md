@@ -23,6 +23,14 @@ This proxy works by interacting with Medium's undocumented(probably
 private but unauthenticated) API. So I've had to make assumptions and
 tweak API schematics as I run into errors.
 
+## Features
+
+-   [x] proxy images
+-   [x] proxy GitHub gists
+-   [x] render posts
+-   [ ] user pages(WIP)
+-   [ ] RSS feeds
+
 ## Why?
 
 Knowledge is the true wealth of humanity. If it weren't for our
