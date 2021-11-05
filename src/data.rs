@@ -195,7 +195,7 @@ impl Data {
                 });
                 let gist = GistContent {
                     files,
-                    html_url: resp.get("html_url").unwrap().to_string(),
+                    html_url: resp.get("html_url").unwrap().as_str().unwrap().to_owned(),
                 };
 
                 self.gists
