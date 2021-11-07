@@ -26,7 +26,7 @@ use sled::{Db, Tree};
 use crate::proxy::StringUtils;
 use crate::SETTINGS;
 
-const POST_CACHE_VERSION: usize = 1;
+const POST_CACHE_VERSION: usize = 2;
 const GIST_CACHE_VERSION: usize = 1;
 
 #[derive(Clone)]
@@ -52,6 +52,10 @@ pub type AppData = web::Data<Data>;
 impl PostResp {
     pub fn get_gist_id<'a>(&self, url: &'a str) -> &'a str {
         url.split('/').last().unwrap()
+    }
+
+    pub fn get_subtitle(&self) -> &str {
+        self.preview_content.as_ref().unwrap().subtitle.as_str()
     }
 }
 
@@ -111,7 +115,7 @@ impl Data {
         for (tree, key, current_version) in trees {
             if let Ok(Some(v)) = tree.get(key) {
                 let version = bincode::deserialize::<usize>(&v[..]).unwrap();
-                let clean = !(version == current_version);
+                let clean = version != current_version;
 
                 if clean {
                     log::info!(

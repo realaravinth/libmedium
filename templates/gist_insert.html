@@ -1,4 +1,4 @@
-<. let gist_id = data.get_gist_id(&src); .>
+<. let gist_id = data.get_gist_id(src); .>
 <. let  (_, gist)= gists.as_ref().unwrap().iter().find(|(id, _)| id == gist_id).as_ref().unwrap(); .>
 <. for file in &gist.files {.>
   <code> <.= file.get_html_content() .> </code>

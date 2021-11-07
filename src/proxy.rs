@@ -17,6 +17,7 @@
 use std::ops::{Bound, RangeBounds};
 
 use actix_web::{http::header, web, HttpResponse, Responder};
+use chrono::{TimeZone, Utc};
 use futures::future::join_all;
 use reqwest::header::CONTENT_TYPE;
 use sailfish::TemplateOnce;
@@ -110,6 +111,9 @@ impl StringUtils for str {
 #[template(rm_whitespace = true)]
 pub struct Post {
     pub data: PostResp,
+    pub date: String,
+    pub preview_img: String,
+    pub reading_time: usize,
     pub id: String,
     pub gists: Option<Vec<(String, crate::data::GistContent)>>,
 }
@@ -166,7 +170,7 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
                 .unwrap()
                 .href;
             if src.contains("gist.github.com") {
-                let gist_id = post_data.get_gist_id(&src);
+                let gist_id = post_data.get_gist_id(src);
                 let fut = data.get_gist(gist_id.to_owned());
                 futs.push(fut);
             }
@@ -179,10 +183,27 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
         Some(x)
     };
 
+    let date = Utc
+        .timestamp_millis(post_data.created_at)
+        .format("%b %e, %Y")
+        .to_string();
+    let reading_time = post_data.reading_time.floor() as usize;
+    let preview_img = post_data
+        .preview_image
+        .as_ref()
+        .unwrap()
+        .id
+        .as_ref()
+        .unwrap();
+    let preview_img = crate::V1_API_ROUTES.proxy.get_medium_asset(preview_img);
+
     let page = Post {
         id: id.to_owned(),
         data: post_data,
+        date,
         gists,
+        reading_time,
+        preview_img,
     };
 
     let page = page.render_once().unwrap();

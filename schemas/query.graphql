@@ -3,10 +3,17 @@ query GetPost($id: ID!) {
         title
         createdAt
         readingTime
+        uniqueSlug
         creator { 
             name
             id
 			imageId
+        }
+        previewImage {
+            id
+        }
+        previewContent {
+            subtitle
         }
         content {
             bodyModel {

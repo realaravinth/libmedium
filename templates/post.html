@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><.= data.title .></title>
+    <. include!("./post_meta.html"); .>
   </head>
   <body>
     <main class="container">
-      <. use chrono::{TimeZone, Utc}; .> 
-      <. let dt = Utc.timestamp_millis(data.created_at); .>
-      <. let date = dt.format("%b %e, %Y").to_string(); .>
       <h1><.= data.title .></h1>
       <p class="meta">
         <a class="author" href="https://medium.com/u/<.= data.creator.id .>" rel="noreferrer">
@@ -20,7 +15,7 @@
           />
           <.= data.creator.name .></a
         >
-        on <.= &date .> &#183; <.= data.reading_time.floor() as usize .> min read
+        on <.= &date .> &#183; <.= reading_time .> min read
       </p>
       <article>
         <. let paragraphs = &data.content.body_model.paragraphs; .>
