@@ -26,7 +26,7 @@ use sled::{Db, Tree};
 use crate::proxy::StringUtils;
 use crate::SETTINGS;
 
-const POST_CACHE_VERSION: usize = 2;
+const POST_CACHE_VERSION: usize = 3;
 const GIST_CACHE_VERSION: usize = 1;
 
 #[derive(Clone)]
@@ -85,6 +85,20 @@ impl GistFile {
         }
         content.replace("\\t", "  ")
     }
+}
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "schemas/schema.graphql",
+    query_path = "schemas/query.graphql",
+    response_derives = "Debug, Serialize, Deserialize, Clone"
+)]
+pub struct GetPostLight;
+
+#[derive(Debug, Clone)]
+pub struct PostUrl {
+    pub slug: String,
+    pub username: String,
 }
 
 impl Data {
@@ -148,6 +162,31 @@ impl Data {
                     .insert(id, bincode::serialize(&res).unwrap())
                     .unwrap();
                 res
+            }
+        }
+    }
+
+    pub async fn get_post_light(&self, id: &str) -> PostUrl {
+        match self.posts.get(id) {
+            Ok(Some(v)) => {
+                let cached: PostResp = bincode::deserialize(&v[..]).unwrap();
+                PostUrl {
+                    slug: cached.unique_slug,
+                    username: cached.creator.username,
+                }
+            }
+            _ => {
+                let vars = get_post_light::Variables { id: id.to_owned() };
+                const URL: &str = "https://medium.com/_/graphql";
+
+                let res = post_graphql::<GetPostLight, _>(&self.client, URL, vars)
+                    .await
+                    .unwrap();
+                let res = res.data.expect("missing response data").post.unwrap();
+                PostUrl {
+                    slug: res.unique_slug,
+                    username: res.creator.username,
+                }
             }
         }
     }

@@ -151,14 +151,13 @@ async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
 
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.by_post_id")]
 async fn by_post_id(path: web::Path<String>, data: AppData) -> impl Responder {
-    let post_data = data.get_post(&path).await;
-    let author = format!("@{}", post_data.creator.username);
+    let post_data = data.get_post_light(&path).await;
     HttpResponse::Found()
         .append_header((
             header::LOCATION,
             crate::V1_API_ROUTES
                 .proxy
-                .get_page(&author, &post_data.unique_slug),
+                .get_page(&post_data.username, &post_data.slug),
         ))
         .finish()
 }
@@ -260,8 +259,8 @@ mod tests {
         }
 
         let urls = vec![
-            "/@ftrain/big-data-small-effort-b62607a43a8c",
-            "/@shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
+            "/ftrain/big-data-small-effort-b62607a43a8c",
+            "/shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
         ];
 
         for uri in urls.iter() {

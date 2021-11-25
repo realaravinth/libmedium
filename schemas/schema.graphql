@@ -55,6 +55,7 @@ type User {
     id: String!
     name: String!
     imageId: String!
+    username: String!
 }
 
 type Post {

@@ -8,6 +8,7 @@ query GetPost($id: ID!) {
             name
             id
 			imageId
+            username
         }
         previewImage {
             id
@@ -46,6 +47,15 @@ query GetPost($id: ID!) {
                     }
                 }
             }
+        }
+    }
+}
+
+query GetPostLight($id: ID!) {
+    post(id: $id) {
+        uniqueSlug
+        creator {
+            username
         }
     }
 }
