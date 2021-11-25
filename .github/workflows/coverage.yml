@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - stable
+          - nightly
 
     name: ${{ matrix.version }} - x86_64-unknown-linux-gnu
     runs-on: ubuntu-latest
@@ -36,18 +36,10 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Generate coverage file
-        if: matrix.version == 'stable' && (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.18.2'
-          args: '-t 1200'
-        env:
-          # GIT_HASH is dummy value. I guess build.rs is skipped in tarpaulin
-          # execution so this value is required for preventing meta tests from
-          # panicking
-          GIT_HASH: 8e77345f1597e40c2e266cb4e6dee74888918a61
+      - name: generate coverage
+        run: make coverage
 
       - name: Upload to Codecov
-        if: matrix.version == 'stable' && (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./target/lcov.info,coverage.xml
