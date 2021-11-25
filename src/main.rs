@@ -75,7 +75,7 @@ async fn main() -> std::io::Result<()> {
                 actix_middleware::TrailingSlash::Trim,
             ))
             .app_data(data.clone())
-            .configure(services)
+            .configure(routes::services)
     })
     .workers(SETTINGS.server.workers.unwrap_or_else(num_cpus::get))
     .bind(SETTINGS.server.get_ip())
@@ -90,8 +90,4 @@ pub fn get_json_err() -> JsonConfig {
         //debug!("JSON deserialization error: {:?}", &err);
         InternalError::new(err, StatusCode::BAD_REQUEST).into()
     })
-}
-
-pub fn services(cfg: &mut actix_web::web::ServiceConfig) {
-    routes::services(cfg);
 }

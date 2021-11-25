@@ -59,7 +59,7 @@ pub fn services(cfg: &mut web::ServiceConfig) {
 mod tests {
     use actix_web::{http::StatusCode, test, App};
 
-    use crate::services;
+    use crate::routes::services;
     use crate::*;
 
     #[actix_rt::test]

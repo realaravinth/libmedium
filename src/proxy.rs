@@ -30,6 +30,7 @@ const CACHE_AGE: u32 = 60 * 60 * 24;
 pub mod routes {
     pub struct Proxy {
         pub index: &'static str,
+        pub by_post_id: &'static str,
         pub page: &'static str,
         pub asset: &'static str,
     }
@@ -38,6 +39,7 @@ pub mod routes {
         pub const fn new() -> Self {
             Self {
                 index: "/",
+                by_post_id: "/utils/post/{post}",
                 page: "/{username}/{post}",
                 asset: "/asset/medium/{name}",
             }
@@ -147,6 +149,20 @@ async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
         .body(res.bytes().await.unwrap())
 }
 
+#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.by_post_id")]
+async fn by_post_id(path: web::Path<String>, data: AppData) -> impl Responder {
+    let post_data = data.get_post(&path).await;
+    let author = format!("@{}", post_data.creator.username);
+    HttpResponse::Found()
+        .append_header((
+            header::LOCATION,
+            crate::V1_API_ROUTES
+                .proxy
+                .get_page(&author, &post_data.unique_slug),
+        ))
+        .finish()
+}
+
 #[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.page")]
 async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responder {
     let post_id = path.1.split('-').last();
@@ -213,6 +229,7 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
 }
 
 pub fn services(cfg: &mut web::ServiceConfig) {
+    cfg.service(by_post_id);
     cfg.service(assets);
     cfg.service(page);
     cfg.service(index);
@@ -222,7 +239,8 @@ pub fn services(cfg: &mut web::ServiceConfig) {
 mod tests {
     use actix_web::{http::StatusCode, test, App};
 
-    use crate::{services, Data};
+    use super::*;
+    use crate::{routes::services, Data};
 
     #[actix_rt::test]
     async fn deploy_update_works() {
@@ -230,8 +248,7 @@ mod tests {
         let app = test::init_service(App::new().app_data(data.clone()).configure(services)).await;
         let urls = vec![
             "/@ftrain/big-data-small-effort-b62607a43a8c",
-            "/geekculture/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
-            "/illumination/5-bugs-that-turned-into-features-e9a0e972a4e7",
+            "/@shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
             "/",
             "/asset/medium/1*LY2ohYsNa9nOV1Clko3zJA.png",
         ];
@@ -240,6 +257,24 @@ mod tests {
             let resp =
                 test::call_service(&app, test::TestRequest::get().uri(uri).to_request()).await;
             assert_eq!(resp.status(), StatusCode::OK);
+        }
+
+        let urls = vec![
+            "/@ftrain/big-data-small-effort-b62607a43a8c",
+            "/@shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8",
+        ];
+
+        for uri in urls.iter() {
+            let id = uri.split('-').last().unwrap();
+
+            let page_url = crate::V1_API_ROUTES.proxy.by_post_id.replace("{post}", id);
+
+            let resp =
+                test::call_service(&app, test::TestRequest::get().uri(&page_url).to_request())
+                    .await;
+            assert_eq!(resp.status(), StatusCode::FOUND);
+            let headers = resp.headers();
+            assert_eq!(headers.get(header::LOCATION).unwrap(), uri);
         }
     }
 }
