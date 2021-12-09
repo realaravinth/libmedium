@@ -63,9 +63,15 @@ code {
   font-family: monospace;
   font-size: 15px;
   white-space: pre-wrap;
-  display: block;
   font-weight: 600;
   line-height: 1rem;
+  padding: 5px;
+  border-radius: 6px;
+  background-color: rgba(175, 184, 193, 0.2);
+}
+
+.code-block {
+  display: block;
 }
 
 iframe {
@@ -117,4 +123,13 @@ iframe {
 
 .meta {
   display: inline-flex;
+}
+
+.gist_contianer {
+  border-radius: 6px;
+  border: 1px solid rgb(211, 211, 211);
+}
+
+.gist_link {
+  margin-left: 5px;
 }
