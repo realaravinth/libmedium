@@ -301,11 +301,11 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AppData</span> <span class="op">=</span> <span class="ident">web::Data</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">PostResp</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_gist_id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_gist_id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="ident">url</span>.<span class="ident">split</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">last</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_subtitle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_subtitle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">preview_content</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">subtitle</span>.<span class="ident">as_str</span>()
     }
 }
@@ -325,7 +325,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GistFile</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_html_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_html_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">content</span>.<span class="ident">as_str</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">content</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) {
             <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">content</span>.<span class="ident">slice</span>(<span class="number">1</span>..);
@@ -353,7 +353,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Data</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AppData</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">AppData</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">SETTINGS</span>.<span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()).<span class="ident">join</span>(<span class="string">&quot;posts_cache&quot;</span>);
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">sled::open</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">posts</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">open_tree</span>(<span class="string">&quot;posts&quot;</span>).<span class="ident">unwrap</span>();
@@ -398,10 +398,10 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PostResp</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PostResp</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">posts</span>.<span class="ident">get</span>(<span class="ident">id</span>) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">unwrap</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) =&gt; <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">unwrap</span>(),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">vars</span> <span class="op">=</span> <span class="ident">get_post::Variables</span> { <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_owned</span>() };
                 <span class="kw">const</span> <span class="ident">URL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://medium.com/_/graphql&quot;</span>;
 
@@ -417,16 +417,16 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_post_light</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PostUrl</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_post_light</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PostUrl</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">posts</span>.<span class="ident">get</span>(<span class="ident">id</span>) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">cached</span>: <span class="ident">PostResp</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">unwrap</span>();
                 <span class="ident">PostUrl</span> {
                     <span class="ident">slug</span>: <span class="ident">cached</span>.<span class="ident">unique_slug</span>,
                     <span class="ident">username</span>: <span class="ident">cached</span>.<span class="ident">creator</span>.<span class="ident">username</span>,
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">vars</span> <span class="op">=</span> <span class="ident">get_post_light::Variables</span> { <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_owned</span>() };
                 <span class="kw">const</span> <span class="ident">URL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://medium.com/_/graphql&quot;</span>;
 
@@ -442,10 +442,10 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_gist</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="ident">GistContent</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_gist</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">String</span>) -&gt; (<span class="ident">String</span>, <span class="ident">GistContent</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">gists</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">id</span>, <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">unwrap</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) =&gt; (<span class="ident">id</span>, <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">unwrap</span>()),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">const</span> <span class="ident">URL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.github.com/gists/&quot;</span>;
 
                 <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">URL</span>, <span class="ident">id</span>);

@@ -315,7 +315,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Proxy</span> {
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
             <span class="self">Self</span> {
                 <span class="ident">index</span>: <span class="string">&quot;/&quot;</span>,
                 <span class="ident">by_post_id</span>: <span class="string">&quot;/utils/post/{post}&quot;</span>,
@@ -323,13 +323,13 @@
                 <span class="ident">asset</span>: <span class="string">&quot;/asset/medium/{name}&quot;</span>,
             }
         }
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_page</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">post</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_page</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">post</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
             <span class="self">self</span>.<span class="ident">page</span>
                 .<span class="ident">replace</span>(<span class="string">&quot;{username}&quot;</span>, <span class="ident">username</span>)
                 .<span class="ident">replace</span>(<span class="string">&quot;{post}&quot;</span>, <span class="ident">post</span>)
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_medium_asset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">asset_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_medium_asset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">asset_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
             <span class="self">self</span>.<span class="ident">asset</span>.<span class="ident">replace</span>(<span class="string">&quot;{name}&quot;</span>, <span class="ident">asset_name</span>)
         }
     }
@@ -338,17 +338,17 @@
 <span class="comment">// credits @carlomilanesi:</span>
 <span class="comment">// https://users.rust-lang.org/t/how-to-get-a-substring-of-a-string/1351/11</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StringUtils</span> {
-    <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span>;
-    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span>;
+    <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span>;
+    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">StringUtils</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">char_pos</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_start</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">it</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>();
         <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">char_pos</span> <span class="op">=</span><span class="op">=</span> <span class="ident">start</span> {
+            <span class="kw">if</span> <span class="ident">char_pos</span> <span class="op">==</span> <span class="ident">start</span> {
                 <span class="kw">break</span>;
             }
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>() {
@@ -361,7 +361,7 @@
         <span class="ident">char_pos</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_end</span> <span class="op">=</span> <span class="ident">byte_start</span>;
         <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">char_pos</span> <span class="op">=</span><span class="op">=</span> <span class="ident">len</span> {
+            <span class="kw">if</span> <span class="ident">char_pos</span> <span class="op">==</span> <span class="ident">len</span> {
                 <span class="kw">break</span>;
             }
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>() {
@@ -373,15 +373,15 @@
         }
         <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">byte_start</span>..<span class="ident">byte_end</span>]
     }
-    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="ident">bound</span>) <span class="op">|</span> <span class="ident">Bound::Excluded</span>(<span class="ident">bound</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">bound</span>,
-            <span class="ident">Bound::Unbounded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="ident">Bound::Included</span>(<span class="ident">bound</span>) <span class="op">|</span> <span class="ident">Bound::Excluded</span>(<span class="ident">bound</span>) =&gt; <span class="kw-2">*</span><span class="ident">bound</span>,
+            <span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
         };
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="ident">bound</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">bound</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="ident">Bound::Excluded</span>(<span class="ident">bound</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">bound</span>,
-            <span class="ident">Bound::Unbounded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>(),
+            <span class="ident">Bound::Included</span>(<span class="ident">bound</span>) =&gt; <span class="kw-2">*</span><span class="ident">bound</span> <span class="op">+</span> <span class="number">1</span>,
+            <span class="ident">Bound::Excluded</span>(<span class="ident">bound</span>) =&gt; <span class="kw-2">*</span><span class="ident">bound</span>,
+            <span class="ident">Bound::Unbounded</span> =&gt; <span class="self">self</span>.<span class="ident">len</span>(),
         } <span class="op">-</span> <span class="ident">start</span>;
         <span class="self">self</span>.<span class="ident">substring</span>(<span class="ident">start</span>, <span class="ident">len</span>)
     }
@@ -402,14 +402,14 @@
 <span class="kw">const</span> <span class="ident">INDEX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../templates/index.html&quot;</span>);
 
 <span class="attribute">#[<span class="ident">my_codegen::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.index&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">index</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Responder</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">index</span>() -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
     <span class="ident">HttpResponse::Ok</span>()
         .<span class="ident">content_type</span>(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
         .<span class="ident">body</span>(<span class="ident">INDEX</span>)
 }
 
 <span class="attribute">#[<span class="ident">my_codegen::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.asset&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">assets</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Responder</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">assets</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">data</span>
         .<span class="ident">client</span>
         .<span class="ident">get</span>(<span class="macro">format!</span>(<span class="string">&quot;https://miro.medium.com/{}&quot;</span>, <span class="ident">path</span>))
@@ -429,7 +429,7 @@
 }
 
 <span class="attribute">#[<span class="ident">my_codegen::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.by_post_id&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">by_post_id</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Responder</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">by_post_id</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
     <span class="kw">let</span> <span class="ident">post_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_post_light</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="kw">await</span>;
     <span class="ident">HttpResponse::Found</span>()
         .<span class="ident">append_header</span>((
@@ -442,7 +442,7 @@
 }
 
 <span class="attribute">#[<span class="ident">my_codegen::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.page&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">page</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Responder</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">page</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
     <span class="kw">let</span> <span class="ident">post_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="number">1</span>.<span class="ident">split</span>(<span class="string">&#39;-&#39;</span>).<span class="ident">last</span>();
     <span class="kw">if</span> <span class="ident">post_id</span>.<span class="ident">is_none</span>() {
         <span class="kw">return</span> <span class="ident">HttpResponse::BadRequest</span>().<span class="ident">finish</span>();
@@ -454,7 +454,7 @@
     <span class="kw">let</span> <span class="ident">paragraphs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">post_data</span>.<span class="ident">content</span>.<span class="ident">body_model</span>.<span class="ident">paragraphs</span>;
 
     <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">paragraphs</span>.<span class="ident">iter</span>() {
-        <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">type_</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;IFRAME&quot;</span> {
+        <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">type_</span> <span class="op">==</span> <span class="string">&quot;IFRAME&quot;</span> {
             <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">p</span>
                 .<span class="ident">iframe</span>
                 .<span class="ident">as_ref</span>()
