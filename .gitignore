@@ -2,3 +2,5 @@
 posts_cache
 tmp/
 *.profraw
+tarpaulin-report.html
+coverage.xml

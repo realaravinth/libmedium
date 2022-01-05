@@ -36,10 +36,14 @@ jobs:
           profile: minimal
           override: true
 
-      - name: generate coverage
-        run: make coverage
+      - name: Generate coverage file
+        if: (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: "-t 1200"
+        env:
+          GIT_HASH: 8e77345f1597e40c2e266cb4e6dee74888918a61
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v2
-        with:
-          files: ./target/lcov.info,coverage.xml
+        if: github.ref == 'refs/heads/master'
