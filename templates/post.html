@@ -27,6 +27,8 @@
             <. include!("./img.html"); .> 
           <.} else if p.type_ == "P" {.>
               <p><. include!("./_markup.html"); .></p>
+          <.} else if p.type_ == "BQ" {.>
+              <blockquote><. include!("./_markup.html"); .></blockquote>
           <.} else if p.type_ == "H2" {.>
             <h2><.= p.text .></h2>
           <.} else if p.type_ == "H3" {.>

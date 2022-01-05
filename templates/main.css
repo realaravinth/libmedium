@@ -138,3 +138,10 @@ iframe {
   background-color: rgb(255, 165, 0);
   padding: 5px;
 }
+
+blockquote {
+  margin-left: -5px;
+  padding-left: 19px;
+  border-left: 4px solid #333;
+  font-style: italic;
+}
