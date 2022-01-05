@@ -133,3 +133,8 @@ iframe {
 .gist_link {
   margin-left: 5px;
 }
+
+.libmedium__meta {
+  background-color: rgb(255, 165, 0);
+  padding: 5px;
+}
