@@ -4,6 +4,7 @@
     <. include!("./post_meta.html"); .>
   </head>
   <body>
+    <. let mut open_list = false ; .>
     <main class="container">
       <h1><.= data.title .></h1>
       <p class="meta">
@@ -20,6 +21,9 @@
       <article>
         <. let paragraphs = &data.content.body_model.paragraphs; .>
         <. for (pindex, p) in paragraphs.iter().enumerate() {.>
+          <. if open_list && p.type_ != "OLI" { .>
+            </ol>
+          <. } .>
           <. if pindex == 0 && p.type_ == "H3" {.>
             <. continue; .>
           <.}.>
@@ -50,6 +54,12 @@
             <.} else {.>
               <iframe src="<.= src .>" frameborder="0"></iframe>
             <.}.>
+            <.} else if p.type_ == "OLI" {.>
+              <. if !open_list { .>
+                  <. open_list = true;.>
+                  <ol>
+              <. } .>
+              <li><.= p.text .></li>
             <.} else {.>
                   <p>
                     <. include!("./_markup.html"); .>

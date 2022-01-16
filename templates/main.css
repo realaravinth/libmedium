@@ -72,6 +72,8 @@ code {
 
 .code-block {
   display: block;
+  margin: 5px 0;
+  padding: 20px;
 }
 
 iframe {
@@ -144,4 +146,8 @@ blockquote {
   padding-left: 19px;
   border-left: 4px solid #333;
   font-style: italic;
+}
+
+ol, ul {
+  margin-left: 40px;
 }
