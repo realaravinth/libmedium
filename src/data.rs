@@ -50,10 +50,6 @@ pub type PostResp = get_post::GetPostPost;
 pub type AppData = web::Data<Data>;
 
 impl PostResp {
-    pub fn get_gist_id<'a>(&self, url: &'a str) -> &'a str {
-        url.split('/').last().unwrap()
-    }
-
     pub fn get_subtitle(&self) -> &str {
         self.preview_content.as_ref().unwrap().subtitle.as_str()
     }
@@ -65,7 +61,7 @@ pub struct GistContent {
     pub html_url: String,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Clone, Serialize)]
 pub struct GistFile {
     pub file_name: String,
     pub content: String,
@@ -191,9 +187,25 @@ impl Data {
         }
     }
 
-    pub async fn get_gist(&self, id: String) -> (String, GistContent) {
-        match self.gists.get(&id) {
-            Ok(Some(v)) => (id, bincode::deserialize(&v[..]).unwrap()),
+    pub fn get_gist_id(url: &str) -> &str {
+        url.split('/').last().unwrap()
+    }
+
+    pub async fn get_gist(&self, gist_url: String) -> (String, GistContent) {
+        let id = Self::get_gist_id(&gist_url).to_owned();
+        let file_name = if gist_url.contains('?') {
+            let parsed = url::Url::parse(&gist_url).unwrap();
+            if let Some((_, file_name)) = parsed.query_pairs().find(|(k, _)| k == "file") {
+                Some(file_name.into_owned())
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        let gist = match self.gists.get(&id) {
+            Ok(Some(v)) => bincode::deserialize(&v[..]).unwrap(),
             _ => {
                 const URL: &str = "https://api.github.com/gists/";
 
@@ -211,9 +223,9 @@ impl Data {
                     .unwrap();
                 let files = resp.get("files").unwrap();
                 let v = files.as_object().unwrap();
-                let mut files = Vec::with_capacity(v.len());
-                v.iter().for_each(|(name, file_obj)| {
-                    let file = GistFile {
+
+                fn to_gist_file(name: &str, file_obj: &serde_json::Value) -> GistFile {
+                    GistFile {
                         file_name: name.to_string(),
                         content: file_obj
                             .get("content")
@@ -233,9 +245,15 @@ impl Data {
                             .as_str()
                             .unwrap()
                             .to_owned(),
-                    };
+                    }
+                }
+
+                let mut files = Vec::with_capacity(v.len());
+                v.iter().for_each(|(name, file_obj)| {
+                    let file = to_gist_file(name, file_obj);
                     files.push(file);
                 });
+
                 let gist = GistContent {
                     files,
                     html_url: resp.get("html_url").unwrap().as_str().unwrap().to_owned(),
@@ -244,8 +262,27 @@ impl Data {
                 self.gists
                     .insert(&id, bincode::serialize(&gist).unwrap())
                     .unwrap();
-                (id, gist)
+                gist
             }
-        }
+        };
+
+        let gist = if let Some(file_name) = file_name {
+            let mut files: Vec<GistFile> = Vec::with_capacity(1);
+            let file = gist
+                .files
+                .iter()
+                .find(|f| f.file_name == file_name)
+                .unwrap()
+                .to_owned();
+            files.push(file);
+            GistContent {
+                files,
+                html_url: gist_url,
+            }
+        } else {
+            gist
+        };
+
+        (id, gist)
     }
 }

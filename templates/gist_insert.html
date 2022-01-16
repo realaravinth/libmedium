@@ -1,9 +1,9 @@
-<. let gist_id = data.get_gist_id(src); .>
+<. let gist_id = crate::data::Data::get_gist_id(src); .>
 <. let  (_, gist)= gists.as_ref().unwrap().iter().find(|(id, _)| id == gist_id).as_ref().unwrap(); .>
 <div class="gist_container">
-<. for file in &gist.files {.>
-  <code class="code-block"> <.= file.get_html_content() .> </code>
-<.}.>
+  <. for file in &gist.files {.>
+    <code class="code-block"> <.= file.get_html_content() .> </code>
+  <.}.>
 <a class="gist_link" href="<.= &gist.html_url .>" target="_blank"
   >See gist on GitHub</a
 >

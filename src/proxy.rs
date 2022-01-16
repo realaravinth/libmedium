@@ -185,8 +185,7 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
                 .unwrap()
                 .href;
             if src.contains("gist.github.com") {
-                let gist_id = post_data.get_gist_id(src);
-                let fut = data.get_gist(gist_id.to_owned());
+                let fut = data.get_gist(src.to_owned());
                 futs.push(fut);
             }
         }
