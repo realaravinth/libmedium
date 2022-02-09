@@ -16,7 +16,11 @@
           />
           <.= data.creator.name .></a
         >
-        on <.= &date .> &#183; <.= reading_time .> min read
+        on <.= &date .> &#183; <.= reading_time .> min read &#183;&nbsp;
+      <a class="medium__source" 
+          href="https://medium.com/<.= data.creator.id .>/<.= data.unique_slug .>" 
+          rel="noreferrer"> Open post in medium.com</a>
+
       </p>
       <article>
         <. let paragraphs = &data.content.body_model.paragraphs; .>
