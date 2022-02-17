@@ -1,4 +1,4 @@
-FROM rust:1.56-slim-bullseye as rust
+FROM rust:slim as rust
 WORKDIR /src
 RUN apt-get update && apt-get install -y git pkg-config libssl-dev
 RUN mkdir src && echo "fn main() {}" > src/main.rs
