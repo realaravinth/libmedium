@@ -1,43 +1,46 @@
 [package]
-name = "libmedium"
-version = "0.1.0"
-edition = "2021"
-build = "build.rs"
-homepage = "https://github.com/realaravinth/libmedium"
-repository = "https://github.com/realaravinth/libmedium"
-documentation = "https://github.con/realaravinth/libmedium"
-readme = "https://github.com/realaravinth/libmedium/blob/master/README.md"
-license = "AGPLv3 or later version"
 authors = ["realaravinth <realaravinth@batsense.net>"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+build = "build.rs"
+documentation = "https://github.con/realaravinth/libmedium"
+edition = "2021"
+homepage = "https://github.com/realaravinth/libmedium"
+license = "AGPLv3 or later version"
+name = "libmedium"
+readme = "https://github.com/realaravinth/libmedium/blob/master/README.md"
+repository = "https://github.com/realaravinth/libmedium"
+version = "0.1.0"
 
 [dependencies]
-actix-web = "4.0.0-beta.9"
 actix-http = "3.0.0-beta.8"
 actix-rt = "2"
-my-codegen = {package = "actix-web-codegen", git ="https://github.com/realaravinth/actix-web"}
-
+actix-web = "4.0.0-beta.9"
+bincode = "1.3.3"
+chrono = "0.4.19"
 config = "0.11"
-
+derive_more = "0.99"
+futures = "0.3.17"
+lazy_static = "1.4"
+log = "0.4"
+num_cpus = "1.13"
+pretty_env_logger = "0.4"
+sailfish = "0.3.2"
 serde = "1"
 serde_json = "1"
-
-pretty_env_logger = "0.4"
-log = "0.4"
-
-lazy_static = "1.4"
-
+sled = "0.34.7"
+syntect = "4.6.0"
 url = "2.2"
 
-derive_more = "0.99"
-sailfish = "0.3.2"
+[dependencies.graphql_client]
+features = ["reqwest"]
+version = "0.10.0"
 
-num_cpus = "1.13"
-reqwest = { version = "0.11.6", features = ["json"] }
-graphql_client = { version = "0.10.0", features = ["reqwest"]}
+[dependencies.my-codegen]
+git = "https://github.com/realaravinth/actix-web"
+package = "actix-web-codegen"
 
-chrono = "0.4.19"
+[dependencies.reqwest]
+features = ["json"]
+version = "0.11.6"
 
 sled = "0.34.7"
 bincode = "1.3.3"

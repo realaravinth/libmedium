@@ -59,6 +59,7 @@ figcaption {
   text-align: center;
 }
 
+/*
 code {
   font-family: monospace;
   font-size: 15px;
@@ -69,6 +70,21 @@ code {
   border-radius: 6px;
   background-color: rgba(175, 184, 193, 0.2);
 }
+*/
+
+/*
+pre {
+  font-family: monospace;
+  font-size: 15px;
+  white-space: pre-wrap;
+  font-weight: 600;
+  line-height: 1rem;
+  padding: 5px;
+  border-radius: 6px;
+  background-color: rgba(175, 184, 193, 0.2);
+}
+
+*/
 
 .code-block {
   display: block;
@@ -121,7 +137,6 @@ iframe {
   font-style: italic;
 }
 
-
 .author {
   display: inline-flex;
   flex-direction: row;
@@ -153,6 +168,17 @@ blockquote {
   font-style: italic;
 }
 
-ol, ul {
+ol,
+ul {
   margin-left: 40px;
+}
+
+.line-number {
+  margin-right: 20px;
+  display: inline-block;
+}
+
+.gist-block {
+  overflow-x: scroll;
+  display: block;
 }

@@ -24,6 +24,7 @@ use serde::{Deserialize, Serialize};
 use sled::{Db, Tree};
 
 use crate::proxy::StringUtils;
+use crate::render_html;
 use crate::SETTINGS;
 
 const POST_CACHE_VERSION: usize = 3;
@@ -204,7 +205,7 @@ impl Data {
             None
         };
 
-        let gist = match self.gists.get(&id) {
+        let mut gist = match self.gists.get(&id) {
             Ok(Some(v)) => bincode::deserialize(&v[..]).unwrap(),
             _ => {
                 const URL: &str = "https://api.github.com/gists/";
@@ -268,18 +269,30 @@ impl Data {
 
         let gist = if let Some(file_name) = file_name {
             let mut files: Vec<GistFile> = Vec::with_capacity(1);
-            let file = gist
+            let mut file = gist
                 .files
                 .iter()
                 .find(|f| f.file_name == file_name)
                 .unwrap()
                 .to_owned();
+            let highlight = render_html::SourcegraphQuery {
+                filepath: &file.file_name,
+                code: &file.content,
+            };
+            file.content = highlight.syntax_highlight();
             files.push(file);
             GistContent {
                 files,
                 html_url: gist_url,
             }
         } else {
+            gist.files.iter_mut().for_each(|f| {
+                let highlight = render_html::SourcegraphQuery {
+                    filepath: &f.file_name,
+                    code: &f.content,
+                };
+                f.content = highlight.syntax_highlight();
+            });
             gist
         };
 

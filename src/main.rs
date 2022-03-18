@@ -26,6 +26,7 @@ use log::info;
 mod data;
 mod meta;
 mod proxy;
+mod render_html;
 mod routes;
 mod settings;
 
@@ -69,7 +70,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(get_json_err())
             .wrap(
                 actix_middleware::DefaultHeaders::new()
-                    .header("Permissions-Policy", "interest-cohort=()"),
+                    .add(("Permissions-Policy", "interest-cohort=()")),
             )
             .wrap(actix_middleware::NormalizePath::new(
                 actix_middleware::TrailingSlash::Trim,

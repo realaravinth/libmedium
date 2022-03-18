@@ -2,7 +2,7 @@
 <. let  (_, gist)= gists.as_ref().unwrap().iter().find(|(id, _)| id == gist_id).as_ref().unwrap(); .>
 <div class="gist_container">
   <. for file in &gist.files {.>
-    <code class="code-block"> <.= file.get_html_content() .> </code>
+    <div class="code-block gist-block"> <.- file.get_html_content() .> </div>
   <.}.>
 <a class="gist_link" href="<.= &gist.html_url .>" target="_blank"
   >See gist on GitHub</a
