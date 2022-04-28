@@ -56,15 +56,15 @@ impl<'a> SourcegraphQuery<'a> {
         // highlighted_html_for_string(&q.code, syntax_set, syntax_def, theme),
         let html = SYNTAX_SET.with(|ss| {
             let language = self.determine_language(ss);
-            highlighted_html_for_string(self.code, ss, &language, theme)
+            highlighted_html_for_string(self.code, ss, language, theme)
         });
+        let total_lines = html.lines().count();
         for (line_num, line) in html.lines().enumerate() {
             if !line.trim().is_empty() {
-                if line_num == 0 {
-                    //|| line_num == total_lines - 1 {
+                if line_num == 0 || line_num == total_lines - 1 {
                     output.push_str(line);
                 } else {
-                    output.push_str(&format!("<div id=\"line-{num}\"class=\"line\"><a href=\"#line-{num}\"<span class=\"line-number\">{num}</span></a>{line}</div>"
+                    output.push_str(&format!("<div title='click for more options' id=\"line-{num}\"class=\"line\"><details class='line_links'><summary class='line_top-link'><a href=\"#line-{num}\"<span class=\"line-number\">{num}</span></a>{line}</summary><a href=\"#line-{num}\"<span class=\"line-link\">Permanant link</span></a><a href=\"#line-{num}\"<span class=\"line-link\">Highlight</span></a></details></div>"
                     ));
                     num += 1;
                 }
@@ -76,12 +76,12 @@ impl<'a> SourcegraphQuery<'a> {
     // adopted from
     // https://github.com/sourcegraph/sourcegraph/blob/9fe138ae75fd64dce06b621572b252a9c9c8da70/docker-images/syntax-highlighter/crates/sg-syntax/src/lib.rs#L81
     // with minimum modifications. Crate was MIT licensed at the time(2022-03-12 11:11)
-    fn determine_language(&self, syntax_set: &SyntaxSet) -> SyntaxReference {
+    fn determine_language<'b>(&self, syntax_set: &'b SyntaxSet) -> &'b SyntaxReference {
         if self.filepath.is_empty() {
             // Legacy codepath, kept for backwards-compatability with old clients.
             match syntax_set.find_syntax_by_first_line(self.code) {
                 Some(v) => {
-                    return v.to_owned();
+                    return v;
                 }
                 None => unimplemented!(), //Err(json!({"error": "invalid extension"})),
             };
@@ -121,8 +121,7 @@ impl<'a> SourcegraphQuery<'a> {
             };
             return syntax_set
                 .find_syntax_by_name(name)
-                .unwrap_or_else(|| syntax_set.find_syntax_plain_text())
-                .to_owned();
+                .unwrap_or_else(|| syntax_set.find_syntax_plain_text());
         }
 
         syntax_set
@@ -134,7 +133,6 @@ impl<'a> SourcegraphQuery<'a> {
             .or_else(|| syntax_set.find_syntax_by_extension(extension))
             .or_else(|| syntax_set.find_syntax_by_first_line(self.code))
             .unwrap_or_else(|| syntax_set.find_syntax_plain_text())
-            .to_owned()
     }
 }
 

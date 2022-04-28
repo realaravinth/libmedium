@@ -29,6 +29,7 @@ tweak API schematics as I run into errors.
 -   [x] proxy images
 -   [x] proxy GitHub gists
 -   [x] render posts
+-   [x] syntax highlighting for gists
 -   [ ] user pages(WIP)
 -   [ ] RSS feeds
 
