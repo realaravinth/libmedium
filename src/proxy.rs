@@ -122,14 +122,14 @@ pub struct Post {
 
 const INDEX: &str = include_str!("../templates/index.html");
 
-#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.index")]
+#[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.index")]
 async fn index() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(INDEX)
 }
 
-#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.asset")]
+#[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.asset")]
 async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
     let res = data
         .client
@@ -149,7 +149,7 @@ async fn assets(path: web::Path<String>, data: AppData) -> impl Responder {
         .body(res.bytes().await.unwrap())
 }
 
-#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.by_post_id")]
+#[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.by_post_id")]
 async fn by_post_id(path: web::Path<String>, data: AppData) -> impl Responder {
     let post_data = data.get_post_light(&path).await;
     HttpResponse::Found()
@@ -162,7 +162,7 @@ async fn by_post_id(path: web::Path<String>, data: AppData) -> impl Responder {
         .finish()
 }
 
-#[my_codegen::get(path = "crate::V1_API_ROUTES.proxy.page")]
+#[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.page")]
 async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responder {
     let post_id = path.1.split('-').last();
     if post_id.is_none() {

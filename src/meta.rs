@@ -42,7 +42,7 @@ pub mod routes {
 }
 
 /// emmits build details of the bninary
-#[my_codegen::get(path = "crate::V1_API_ROUTES.meta.build_details")]
+#[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.meta.build_details")]
 async fn build_details() -> impl Responder {
     let build = BuildDetails {
         version: VERSION,
