@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["STYLE",""],["SYNTAX_SET",""]],"struct":[["SourcegraphQuery",""]],"trait":[["GenerateHTML",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["STYLE",""],["SYNTAX_SET",""]],"struct":[["SourcegraphQuery",""]],"trait":[["GenerateHTML",""]]};

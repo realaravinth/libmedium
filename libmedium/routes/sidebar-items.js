@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["ROUTES",""]],"fn":[["services",""]],"struct":[["Routes",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["ROUTES",""]],"fn":[["services",""]],"struct":[["Routes",""]]};
