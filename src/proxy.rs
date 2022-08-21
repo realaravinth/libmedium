@@ -23,6 +23,7 @@ use reqwest::header::CONTENT_TYPE;
 use sailfish::TemplateOnce;
 
 use crate::data::PostResp;
+use crate::post::apply_markup;
 use crate::AppData;
 
 const CACHE_AGE: u32 = 60 * 60 * 24;
@@ -99,11 +100,14 @@ impl StringUtils for str {
             Bound::Included(bound) | Bound::Excluded(bound) => *bound,
             Bound::Unbounded => 0,
         };
+        log::debug!("{}", self);
+        log::debug!("start: {start}");
         let len = match range.end_bound() {
             Bound::Included(bound) => *bound + 1,
             Bound::Excluded(bound) => *bound,
             Bound::Unbounded => self.len(),
         } - start;
+        log::debug!("len {len}");
         self.substring(start, len)
     }
 }
@@ -118,6 +122,7 @@ pub struct Post {
     pub reading_time: usize,
     pub id: String,
     pub gists: Option<Vec<(String, crate::data::GistContent)>>,
+    pub paragraphs: Vec<String>,
 }
 
 const INDEX: &str = include_str!("../templates/index.html");
@@ -211,6 +216,8 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
         .unwrap();
     let preview_img = crate::V1_API_ROUTES.proxy.get_medium_asset(preview_img);
 
+    let paragraphs = apply_markup(&post_data, &gists);
+
     let page = Post {
         id: id.to_owned(),
         data: post_data,
@@ -218,6 +225,7 @@ async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responde
         gists,
         reading_time,
         preview_img,
+        paragraphs,
     };
 
     let page = page.render_once().unwrap();

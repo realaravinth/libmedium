@@ -23,63 +23,8 @@
 
       </p>
       <article>
-        <. let paragraphs = &data.content.body_model.paragraphs; .>
-        <. for (pindex, p) in paragraphs.iter().enumerate() {.>
-          <. if open_list && p.type_ != "OLI" { .>
-            </ol>
-          <. } .>
-          <. if pindex == 0 && p.type_ == "H3" {.>
-            <. continue; .>
-          <.}.>
-         <. if p.type_ == "IMG" {.>
-            <. include!("./img.html"); .> 
-          <.} else if p.type_ == "P" {.>
-              <p><. include!("./_markup.html"); .></p>
-          <.} else if p.type_ == "BQ" {.>
-              <blockquote><. include!("./_markup.html"); .></blockquote>
-          <.} else if p.type_ == "H2" {.>
-            <h2><.= p.text .></h2>
-          <.} else if p.type_ == "H3" {.>
-            <h3><.= p.text .></h3>
-          <.} else if p.type_ == "H4" {.>
-            <h4><.= p.text .></h4>
-          <.} else if p.type_ == "H5" {.>
-            <h5><.= p.text .></h5>
-          <.} else if p.type_ == "H6" {.>
-            <h6><.= p.text .></h6>
-          <.} else if p.type_ == "IFRAME" {.>
-            <. let src = &p.iframe.as_ref().unwrap().media_resource.as_ref().unwrap().href; .>
-            <. if src.contains("gist.github.com"){.>
-              <. include!("./gist_insert.html"); .>
-              <!--
-              <iframe src="<.#= crate::V1_API_ROUTES.proxy.get_gist(&src) .>" frameborder="0"></iframe>
-              <a href="<.= src .>">Click here to open gist on GitHub</a>
-              -->
-            <.} else {.>
-              <iframe src="<.= src .>" frameborder="0"></iframe>
-            <.}.>
-            <.} else if p.type_ == "OLI" {.>
-              <. if !open_list { .>
-                  <. open_list = true;.>
-                  <ol>
-              <. } .>
-              <li><.= p.text .></li>
-            <.} else {.>
-                  <p>
-                    <. include!("./_markup.html"); .>
-                  </p>
-                  <p class="libmedium__meta">
-                    <b>From LibMedium:</b> LibMedium is built by reverse
-                    engineering the Meduim's internal API. This post contains
-                    markup(formatting rules) that we are unaware of.
-                    Please report this URL <a
-                    href="https://github.com/realaravinth/libmedium/issues/1"
-                    rel="noreferrer">on our bug tracker</a> so that we can
-                    improve page rendering.
-                    <br />
-                    Alternatively, you can also email me at realaravinth at batsense dot net!
-                  </p>
-            <.}.>
+        <. for (_pindex, p) in paragraphs.iter().enumerate() {.>
+            <.- p .>
         <.}.>
       </article>
   </main>

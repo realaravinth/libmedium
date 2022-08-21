@@ -25,6 +25,7 @@ use log::info;
 
 mod data;
 mod meta;
+mod post;
 mod proxy;
 mod render_html;
 mod routes;
