@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["libmedium"] = [{"text":"impl&lt;'a, 'b&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/1.63.0/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"libmedium/post/struct.PositionMap.html\" title=\"struct libmedium::post::PositionMap\">PositionMap</a>&lt;'a, 'b&gt;","synthetic":false,"types":["libmedium::post::PositionMap"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

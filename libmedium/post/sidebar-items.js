@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["PostitionType",""]],"fn":[["apply_markup",""]],"struct":[["Markup",""],["PositionMap",""]]};
