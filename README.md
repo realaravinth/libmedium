@@ -49,6 +49,16 @@ publications that has been around forever. So it is possible. I hope
 medium.com comes up with other, non-harmful ways to run a sustainable
 business.
 
+## Instances
+| Instance                       | Country | Provider | Host                     |
+|--------------------------------|---------|----------|--------------------------|
+| https://libmedium.batsense.net | India   | Airtel   | @realaravinth            |
+| https://md.vern.cc             | Canada  | OVH      | [~vern](https://vern.cc) |
+| http://md.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ | N/A | OVH | [~vern](https://vern.cc) |
+| http://vernaqj2qr2pijpgvf3od6ssc3ulz3nv52gwr3hba5l6humuzmgq.b32.i2p/ | N/A | OVH | [~vern](https://vern.cc)
+
+
+
 ## Deploy
 
 1. Grab [`./config/default.toml`](./config/default.toml) and make
@@ -71,6 +81,7 @@ above command.
 ```
 make docker
 ```
+
 
 ---
 
