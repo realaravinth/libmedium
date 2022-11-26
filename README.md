@@ -53,9 +53,9 @@ business.
 | Instance                       | Country | Provider | Host                     |
 |--------------------------------|---------|----------|--------------------------|
 | https://libmedium.batsense.net | India   | Airtel   | @realaravinth            |
-| https://md.vern.cc             | Canada  | OVH      | [~vern](https://vern.cc) |
-| http://md.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ | N/A | OVH | [~vern](https://vern.cc) |
-| http://vernaqj2qr2pijpgvf3od6ssc3ulz3nv52gwr3hba5l6humuzmgq.b32.i2p/ | N/A | OVH | [~vern](https://vern.cc)
+| https://md.vern.cc             | US   | Hetzner      | [~vern](https://vern.cc) |
+| http://md.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ | N/A | Hetzner | [~vern](https://vern.cc) |
+| http://vernaqj2qr2pijpgvf3od6ssc3ulz3nv52gwr3hba5l6humuzmgq.b32.i2p/ | N/A | Hetzner | [~vern](https://vern.cc)
 
 
 
