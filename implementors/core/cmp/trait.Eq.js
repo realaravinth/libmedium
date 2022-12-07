@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["libmedium"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.64.0/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"enum\" href=\"libmedium/post/enum.PostitionType.html\" title=\"enum libmedium::post::PostitionType\">PostitionType</a>","synthetic":false,"types":["libmedium::post::PostitionType"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"libmedium":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.65.0/core/cmp/trait.Eq.html\" title=\"trait core::cmp::Eq\">Eq</a> for <a class=\"enum\" href=\"libmedium/post/enum.PostitionType.html\" title=\"enum libmedium::post::PostitionType\">PostitionType</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

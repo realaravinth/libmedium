@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["libmedium"] = [{"text":"impl <a class=\"trait\" href=\"https://docs.rs/lazy_static/1.4.0/lazy_static/trait.LazyStatic.html\" title=\"trait lazy_static::LazyStatic\">LazyStatic</a> for <a class=\"struct\" href=\"libmedium/struct.SETTINGS.html\" title=\"struct libmedium::SETTINGS\">SETTINGS</a>","synthetic":false,"types":["libmedium::SETTINGS"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"libmedium":[["impl <a class=\"trait\" href=\"https://docs.rs/lazy_static/1.4.0/lazy_static/trait.LazyStatic.html\" title=\"trait lazy_static::LazyStatic\">LazyStatic</a> for <a class=\"struct\" href=\"libmedium/struct.SETTINGS.html\" title=\"struct libmedium::SETTINGS\">SETTINGS</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

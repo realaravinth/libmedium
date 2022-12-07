@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/render_html.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>render_html.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libmedium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/render_html.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>render_html.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libmedium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -181,158 +181,158 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
- */</span>
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+ */
+</span><span class="kw">use </span>std::path::Path;
 
-<span class="kw">use</span> <span class="ident">syntect::highlighting</span>::{<span class="ident">Color</span>, <span class="ident">ThemeSet</span>};
-<span class="kw">use</span> <span class="ident">syntect::html::highlighted_html_for_string</span>;
-<span class="kw">use</span> <span class="ident">syntect::parsing</span>::{<span class="ident">SyntaxReference</span>, <span class="ident">SyntaxSet</span>};
+<span class="kw">use </span>syntect::highlighting::{Color, ThemeSet};
+<span class="kw">use </span>syntect::html::highlighted_html_for_string;
+<span class="kw">use </span>syntect::parsing::{SyntaxReference, SyntaxSet};
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GenerateHTML</span> {
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+<span class="kw">pub trait </span>GenerateHTML {
+    <span class="kw">fn </span>generate(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STYLE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">pub const </span>STYLE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;
     &quot;</span>;
 
-<span class="macro">thread_local!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static</span> <span class="ident">SYNTAX_SET</span>: <span class="ident">SyntaxSet</span> <span class="op">=</span> <span class="ident">SyntaxSet::load_defaults_newlines</span>();
+<span class="macro">thread_local! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>SYNTAX_SET: SyntaxSet = SyntaxSet::load_defaults_newlines();
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SourcegraphQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">filepath</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="kw">pub struct </span>SourcegraphQuery&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>filepath: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub </span>code: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SourcegraphQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">syntax_highlight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="comment">//    let ss = SYNTAX_SET;</span>
-        <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">ThemeSet::load_defaults</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SourcegraphQuery&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>syntax_highlight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="comment">//    let ss = SYNTAX_SET;
+        </span><span class="kw">let </span>ts = ThemeSet::load_defaults();
 
-        <span class="kw">let</span> <span class="ident">theme</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ts</span>.<span class="ident">themes</span>[<span class="string">&quot;InspiredGitHub&quot;</span>];
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">theme</span>.<span class="ident">settings</span>.<span class="ident">background</span>.<span class="ident">unwrap_or</span>(<span class="ident">Color::WHITE</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">num</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>theme = <span class="kw-2">&amp;</span>ts.themes[<span class="string">&quot;InspiredGitHub&quot;</span>];
+        <span class="kw">let </span>c = theme.settings.background.unwrap_or(Color::WHITE);
+        <span class="kw">let </span><span class="kw-2">mut </span>num = <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="macro">format!</span>(
             <span class="string">&quot;&lt;style&gt;
         .gist_file {{
             background-color:#{:02x}{:02x}{:02x};
         }}&lt;/style&gt;&quot;</span>,
-            <span class="ident">c</span>.<span class="ident">r</span>, <span class="ident">c</span>.<span class="ident">g</span>, <span class="ident">c</span>.<span class="ident">b</span>
+            c.r, c.g, c.b
         );
 
-        <span class="comment">// highlighted_html_for_string(&amp;q.code, syntax_set, syntax_def, theme),</span>
-        <span class="kw">let</span> <span class="ident">html</span> <span class="op">=</span> <span class="ident">SYNTAX_SET</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ss</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">language</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">determine_language</span>(<span class="ident">ss</span>);
-            <span class="ident">highlighted_html_for_string</span>(<span class="self">self</span>.<span class="ident">code</span>, <span class="ident">ss</span>, <span class="ident">language</span>, <span class="ident">theme</span>)
+        <span class="comment">// highlighted_html_for_string(&amp;q.code, syntax_set, syntax_def, theme),
+        </span><span class="kw">let </span>html = SYNTAX_SET.with(|ss| {
+            <span class="kw">let </span>language = <span class="self">self</span>.determine_language(ss);
+            highlighted_html_for_string(<span class="self">self</span>.code, ss, language, theme)
         });
-        <span class="kw">let</span> <span class="ident">total_lines</span> <span class="op">=</span> <span class="ident">html</span>.<span class="ident">lines</span>().<span class="ident">count</span>();
-        <span class="kw">for</span> (<span class="ident">line_num</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">html</span>.<span class="ident">lines</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">line</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() {
-                <span class="kw">if</span> <span class="ident">line_num</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">line_num</span> <span class="op">==</span> <span class="ident">total_lines</span> <span class="op">-</span> <span class="number">1</span> {
-                    <span class="ident">output</span>.<span class="ident">push_str</span>(<span class="ident">line</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">output</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;div title=&#39;click for more options&#39; id=\&quot;line-{num}\&quot;class=\&quot;line\&quot;&gt;&lt;details class=&#39;line_links&#39;&gt;&lt;summary class=&#39;line_top-link&#39;&gt;&lt;a href=\&quot;#line-{num}\&quot;&lt;span class=\&quot;line-number\&quot;&gt;{num}&lt;/span&gt;&lt;/a&gt;{line}&lt;/summary&gt;&lt;a href=\&quot;#line-{num}\&quot;&lt;span class=\&quot;line-link\&quot;&gt;Permanant link&lt;/span&gt;&lt;/a&gt;&lt;a href=\&quot;#line-{num}\&quot;&lt;span class=\&quot;line-link\&quot;&gt;Highlight&lt;/span&gt;&lt;/a&gt;&lt;/details&gt;&lt;/div&gt;&quot;</span>
-                    ));
-                    <span class="ident">num</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span>total_lines = html.lines().count();
+        <span class="kw">for </span>(line_num, line) <span class="kw">in </span>html.lines().enumerate() {
+            <span class="kw">if </span>!line.trim().is_empty() {
+                <span class="kw">if </span>line_num == <span class="number">0 </span>|| line_num == total_lines - <span class="number">1 </span>{
+                    output.push_str(line);
+                } <span class="kw">else </span>{
+                    output.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;div title=&#39;click for more options&#39; id=\&quot;line-{num}\&quot;class=\&quot;line\&quot;&gt;&lt;details class=&#39;line_links&#39;&gt;&lt;summary class=&#39;line_top-link&#39;&gt;&lt;a href=\&quot;#line-{num}\&quot;&lt;span class=\&quot;line-number\&quot;&gt;{num}&lt;/span&gt;&lt;/a&gt;{line}&lt;/summary&gt;&lt;a href=\&quot;#line-{num}\&quot;&lt;span class=\&quot;line-link\&quot;&gt;Permanant link&lt;/span&gt;&lt;/a&gt;&lt;a href=\&quot;#line-{num}\&quot;&lt;span class=\&quot;line-link\&quot;&gt;Highlight&lt;/span&gt;&lt;/a&gt;&lt;/details&gt;&lt;/div&gt;&quot;
+                    </span>));
+                    num += <span class="number">1</span>;
                 }
             }
         }
-        <span class="ident">output</span>
+        output
     }
 
-    <span class="comment">// adopted from</span>
-    <span class="comment">// https://github.com/sourcegraph/sourcegraph/blob/9fe138ae75fd64dce06b621572b252a9c9c8da70/docker-images/syntax-highlighter/crates/sg-syntax/src/lib.rs#L81</span>
-    <span class="comment">// with minimum modifications. Crate was MIT licensed at the time(2022-03-12 11:11)</span>
-    <span class="kw">fn</span> <span class="ident">determine_language</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">syntax_set</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">SyntaxSet</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">SyntaxReference</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">filepath</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// Legacy codepath, kept for backwards-compatability with old clients.</span>
-            <span class="kw">match</span> <span class="ident">syntax_set</span>.<span class="ident">find_syntax_by_first_line</span>(<span class="self">self</span>.<span class="ident">code</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; {
-                    <span class="kw">return</span> <span class="ident">v</span>;
+    <span class="comment">// adopted from
+    // https://github.com/sourcegraph/sourcegraph/blob/9fe138ae75fd64dce06b621572b252a9c9c8da70/docker-images/syntax-highlighter/crates/sg-syntax/src/lib.rs#L81
+    // with minimum modifications. Crate was MIT licensed at the time(2022-03-12 11:11)
+    </span><span class="kw">fn </span>determine_language&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, syntax_set: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>SyntaxSet) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>SyntaxReference {
+        <span class="kw">if </span><span class="self">self</span>.filepath.is_empty() {
+            <span class="comment">// Legacy codepath, kept for backwards-compatability with old clients.
+            </span><span class="kw">match </span>syntax_set.find_syntax_by_first_line(<span class="self">self</span>.code) {
+                <span class="prelude-val">Some</span>(v) =&gt; {
+                    <span class="kw">return </span>v;
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="macro">unimplemented!</span>(), <span class="comment">//Err(json!({&quot;error&quot;: &quot;invalid extension&quot;})),</span>
-            };
+                <span class="prelude-val">None </span>=&gt; <span class="macro">unimplemented!</span>(), <span class="comment">//Err(json!({&quot;error&quot;: &quot;invalid extension&quot;})),
+            </span>};
         }
 
-        <span class="comment">// Split the input path (&quot;foo/myfile.go&quot;) into file name</span>
-        <span class="comment">// (&quot;myfile.go&quot;) and extension (&quot;go&quot;).</span>
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filepath</span>);
-        <span class="kw">let</span> <span class="ident">file_name</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">file_name</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_str</span>()).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>);
-        <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">extension</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_str</span>()).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>);
+        <span class="comment">// Split the input path (&quot;foo/myfile.go&quot;) into file name
+        // (&quot;myfile.go&quot;) and extension (&quot;go&quot;).
+        </span><span class="kw">let </span>path = Path::new(<span class="kw-2">&amp;</span><span class="self">self</span>.filepath);
+        <span class="kw">let </span>file_name = path.file_name().and_then(|n| n.to_str()).unwrap_or(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>extension = path.extension().and_then(|x| x.to_str()).unwrap_or(<span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// Override syntect&#39;s language detection for conflicting file extensions because</span>
-        <span class="comment">// it&#39;s impossible to express this logic in a syntax definition.</span>
-        <span class="kw">struct</span> <span class="ident">Override</span> {
-            <span class="ident">extension</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-            <span class="ident">prefix_langs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span>,
-            <span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+        <span class="comment">// Override syntect&#39;s language detection for conflicting file extensions because
+        // it&#39;s impossible to express this logic in a syntax definition.
+        </span><span class="kw">struct </span>Override {
+            extension: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+            prefix_langs: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt;,
+            default: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
         }
-        <span class="kw">let</span> <span class="ident">overrides</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Override</span> {
-            <span class="ident">extension</span>: <span class="string">&quot;cls&quot;</span>,
-            <span class="ident">prefix_langs</span>: <span class="macro">vec!</span>[(<span class="string">&quot;%&quot;</span>, <span class="string">&quot;TeX&quot;</span>), (<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;TeX&quot;</span>)],
-            <span class="ident">default</span>: <span class="string">&quot;Apex&quot;</span>,
+        <span class="kw">let </span>overrides = <span class="macro">vec!</span>[Override {
+            extension: <span class="string">&quot;cls&quot;</span>,
+            prefix_langs: <span class="macro">vec!</span>[(<span class="string">&quot;%&quot;</span>, <span class="string">&quot;TeX&quot;</span>), (<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;TeX&quot;</span>)],
+            default: <span class="string">&quot;Apex&quot;</span>,
         }];
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Override</span> {
-            <span class="ident">prefix_langs</span>,
-            <span class="ident">default</span>,
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(Override {
+            prefix_langs,
+            default,
             ..
-        }) <span class="op">=</span> <span class="ident">overrides</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">extension</span> <span class="op">==</span> <span class="ident">extension</span>)
+        }) = overrides.iter().find(|o| o.extension == extension)
         {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">prefix_langs</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">prefix</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">code</span>.<span class="ident">starts_with</span>(<span class="ident">prefix</span>))
+            <span class="kw">let </span>name = <span class="kw">match </span>prefix_langs
+                .iter()
+                .find(|(prefix, <span class="kw">_</span>)| <span class="self">self</span>.code.starts_with(prefix))
             {
-                <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">lang</span>)) =&gt; <span class="ident">lang</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="ident">default</span>,
+                <span class="prelude-val">Some</span>((<span class="kw">_</span>, lang)) =&gt; lang,
+                <span class="prelude-val">None </span>=&gt; default,
             };
-            <span class="kw">return</span> <span class="ident">syntax_set</span>
-                .<span class="ident">find_syntax_by_name</span>(<span class="ident">name</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syntax_set</span>.<span class="ident">find_syntax_plain_text</span>());
+            <span class="kw">return </span>syntax_set
+                .find_syntax_by_name(name)
+                .unwrap_or_else(|| syntax_set.find_syntax_plain_text());
         }
 
-        <span class="ident">syntax_set</span>
-            <span class="comment">// First try to find a syntax whose &quot;extension&quot; matches our file</span>
-            <span class="comment">// name. This is done due to some syntaxes matching an &quot;extension&quot;</span>
-            <span class="comment">// that is actually a whole file name (e.g. &quot;Dockerfile&quot; or &quot;CMakeLists.txt&quot;)</span>
-            <span class="comment">// see https://github.com/trishume/syntect/pull/170</span>
-            .<span class="ident">find_syntax_by_extension</span>(<span class="ident">file_name</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syntax_set</span>.<span class="ident">find_syntax_by_extension</span>(<span class="ident">extension</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syntax_set</span>.<span class="ident">find_syntax_by_first_line</span>(<span class="self">self</span>.<span class="ident">code</span>))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syntax_set</span>.<span class="ident">find_syntax_plain_text</span>())
+        syntax_set
+            <span class="comment">// First try to find a syntax whose &quot;extension&quot; matches our file
+            // name. This is done due to some syntaxes matching an &quot;extension&quot;
+            // that is actually a whole file name (e.g. &quot;Dockerfile&quot; or &quot;CMakeLists.txt&quot;)
+            // see https://github.com/trishume/syntect/pull/170
+            </span>.find_syntax_by_extension(file_name)
+            .or_else(|| syntax_set.find_syntax_by_extension(extension))
+            .or_else(|| syntax_set.find_syntax_by_first_line(<span class="self">self</span>.code))
+            .unwrap_or_else(|| syntax_set.find_syntax_plain_text())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SourcegraphQuery</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::SourcegraphQuery;
 
-    <span class="kw">use</span> <span class="ident">syntect::parsing::SyntaxSet</span>;
+    <span class="kw">use </span>syntect::parsing::SyntaxSet;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cls_tex</span>() {
-        <span class="kw">let</span> <span class="ident">syntax_set</span> <span class="op">=</span> <span class="ident">SyntaxSet::load_defaults_newlines</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">SourcegraphQuery</span> {
-            <span class="ident">filepath</span>: <span class="string">&quot;foo.cls&quot;</span>,
-            <span class="ident">code</span>: <span class="string">&quot;%&quot;</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>cls_tex() {
+        <span class="kw">let </span>syntax_set = SyntaxSet::load_defaults_newlines();
+        <span class="kw">let </span>query = SourcegraphQuery {
+            filepath: <span class="string">&quot;foo.cls&quot;</span>,
+            code: <span class="string">&quot;%&quot;</span>,
         };
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">determine_language</span>(<span class="kw-2">&amp;</span><span class="ident">syntax_set</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">name</span>, <span class="string">&quot;TeX&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_result</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">syntax_highlight</span>();
+        <span class="kw">let </span>result = query.determine_language(<span class="kw-2">&amp;</span>syntax_set);
+        <span class="macro">assert_eq!</span>(result.name, <span class="string">&quot;TeX&quot;</span>);
+        <span class="kw">let </span>_result = query.syntax_highlight();
     }
 
-    <span class="comment">//#[test]</span>
-    <span class="comment">//fn cls_apex() {</span>
-    <span class="comment">//    let syntax_set = SyntaxSet::load_defaults_newlines();</span>
-    <span class="comment">//    let query = SourcegraphQuery {</span>
-    <span class="comment">//        filepath: &quot;foo.cls&quot;.to_string(),</span>
-    <span class="comment">//        code: &quot;/**&quot;.to_string(),</span>
-    <span class="comment">//        extension: String::new(),</span>
-    <span class="comment">//    };</span>
-    <span class="comment">//    let result = determine_language(&amp;query, &amp;syntax_set);</span>
-    <span class="comment">//    assert_eq!(result.unwrap().name, &quot;Apex&quot;);</span>
-    <span class="comment">//}</span>
-}
+    <span class="comment">//#[test]
+    //fn cls_apex() {
+    //    let syntax_set = SyntaxSet::load_defaults_newlines();
+    //    let query = SourcegraphQuery {
+    //        filepath: &quot;foo.cls&quot;.to_string(),
+    //        code: &quot;/**&quot;.to_string(),
+    //        extension: String::new(),
+    //    };
+    //    let result = determine_language(&amp;query, &amp;syntax_set);
+    //    assert_eq!(result.unwrap().name, &quot;Apex&quot;);
+    //}
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libmedium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libmedium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/proxy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>proxy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libmedium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/proxy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>proxy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libmedium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libmedium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -299,276 +299,276 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
- */</span>
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Bound</span>, <span class="ident">RangeBounds</span>};
+ */
+</span><span class="kw">use </span>std::ops::{Bound, RangeBounds};
 
-<span class="kw">use</span> <span class="ident">actix_web</span>::{<span class="ident">http::header</span>, <span class="ident">web</span>, <span class="ident">HttpResponse</span>, <span class="ident">Responder</span>};
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">futures::future::join_all</span>;
-<span class="kw">use</span> <span class="ident">reqwest::header::CONTENT_TYPE</span>;
-<span class="kw">use</span> <span class="ident">sailfish::TemplateOnce</span>;
+<span class="kw">use </span>actix_web::{http::header, web, HttpResponse, Responder};
+<span class="kw">use </span>chrono::{TimeZone, Utc};
+<span class="kw">use </span>futures::future::join_all;
+<span class="kw">use </span>reqwest::header::CONTENT_TYPE;
+<span class="kw">use </span>sailfish::TemplateOnce;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::data::PostResp</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::post::apply_markup</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AppData</span>;
+<span class="kw">use </span><span class="kw">crate</span>::data::PostResp;
+<span class="kw">use </span><span class="kw">crate</span>::post::apply_markup;
+<span class="kw">use </span><span class="kw">crate</span>::AppData;
 
-<span class="kw">const</span> <span class="ident">CACHE_AGE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">24</span>;
+<span class="kw">const </span>CACHE_AGE: u32 = <span class="number">60 </span>* <span class="number">60 </span>* <span class="number">24</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">routes</span> {
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Proxy</span> {
-        <span class="kw">pub</span> <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="kw">pub</span> <span class="ident">by_post_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="kw">pub</span> <span class="ident">page</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="kw">pub</span> <span class="ident">asset</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+<span class="kw">pub mod </span>routes {
+    <span class="kw">pub struct </span>Proxy {
+        <span class="kw">pub </span>index: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        <span class="kw">pub </span>by_post_id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        <span class="kw">pub </span>page: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        <span class="kw">pub </span>asset: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     }
 
-    <span class="kw">impl</span> <span class="ident">Proxy</span> {
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-            <span class="self">Self</span> {
-                <span class="ident">index</span>: <span class="string">&quot;/&quot;</span>,
-                <span class="ident">by_post_id</span>: <span class="string">&quot;/utils/post/{post}&quot;</span>,
-                <span class="ident">page</span>: <span class="string">&quot;/{username}/{post}&quot;</span>,
-                <span class="ident">asset</span>: <span class="string">&quot;/asset/medium/{name}&quot;</span>,
+    <span class="kw">impl </span>Proxy {
+        <span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                index: <span class="string">&quot;/&quot;</span>,
+                by_post_id: <span class="string">&quot;/utils/post/{post}&quot;</span>,
+                page: <span class="string">&quot;/{username}/{post}&quot;</span>,
+                asset: <span class="string">&quot;/asset/medium/{name}&quot;</span>,
             }
         }
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_page</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">post</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-            <span class="self">self</span>.<span class="ident">page</span>
-                .<span class="ident">replace</span>(<span class="string">&quot;{username}&quot;</span>, <span class="ident">username</span>)
-                .<span class="ident">replace</span>(<span class="string">&quot;{post}&quot;</span>, <span class="ident">post</span>)
+        <span class="kw">pub fn </span>get_page(<span class="kw-2">&amp;</span><span class="self">self</span>, username: <span class="kw-2">&amp;</span>str, post: <span class="kw-2">&amp;</span>str) -&gt; String {
+            <span class="self">self</span>.page
+                .replace(<span class="string">&quot;{username}&quot;</span>, username)
+                .replace(<span class="string">&quot;{post}&quot;</span>, post)
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_medium_asset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">asset_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-            <span class="self">self</span>.<span class="ident">asset</span>.<span class="ident">replace</span>(<span class="string">&quot;{name}&quot;</span>, <span class="ident">asset_name</span>)
+        <span class="kw">pub fn </span>get_medium_asset(<span class="kw-2">&amp;</span><span class="self">self</span>, asset_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+            <span class="self">self</span>.asset.replace(<span class="string">&quot;{name}&quot;</span>, asset_name)
         }
     }
 }
 
-<span class="comment">// credits @carlomilanesi:</span>
-<span class="comment">// https://users.rust-lang.org/t/how-to-get-a-substring-of-a-string/1351/11</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StringUtils</span> {
-    <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span>;
-    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span>;
+<span class="comment">// credits @carlomilanesi:
+// https://users.rust-lang.org/t/how-to-get-a-substring-of-a-string/1351/11
+</span><span class="kw">pub trait </span>StringUtils {
+    <span class="kw">fn </span>substring(<span class="kw-2">&amp;</span><span class="self">self</span>, start: usize, len: usize) -&gt; <span class="kw-2">&amp;</span>str;
+    <span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>, range: <span class="kw">impl </span>RangeBounds&lt;usize&gt;) -&gt; <span class="kw-2">&amp;</span>str;
 }
 
-<span class="kw">impl</span> <span class="ident">StringUtils</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">char_pos</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_start</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">it</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">char_pos</span> <span class="op">==</span> <span class="ident">start</span> {
+<span class="kw">impl </span>StringUtils <span class="kw">for </span>str {
+    <span class="kw">fn </span>substring(<span class="kw-2">&amp;</span><span class="self">self</span>, start: usize, len: usize) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">let </span><span class="kw-2">mut </span>char_pos = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>byte_start = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>it = <span class="self">self</span>.chars();
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>char_pos == start {
                 <span class="kw">break</span>;
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>() {
-                <span class="ident">char_pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">byte_start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">len_utf8</span>();
-            } <span class="kw">else</span> {
-                <span class="kw">break</span>;
-            }
-        }
-        <span class="ident">char_pos</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_end</span> <span class="op">=</span> <span class="ident">byte_start</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">char_pos</span> <span class="op">==</span> <span class="ident">len</span> {
-                <span class="kw">break</span>;
-            }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>() {
-                <span class="ident">char_pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">byte_end</span> <span class="op">+</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">len_utf8</span>();
-            } <span class="kw">else</span> {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = it.next() {
+                char_pos += <span class="number">1</span>;
+                byte_start += c.len_utf8();
+            } <span class="kw">else </span>{
                 <span class="kw">break</span>;
             }
         }
-        <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">byte_start</span>..<span class="ident">byte_end</span>]
+        char_pos = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>byte_end = byte_start;
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>char_pos == len {
+                <span class="kw">break</span>;
+            }
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = it.next() {
+                char_pos += <span class="number">1</span>;
+                byte_end += c.len_utf8();
+            } <span class="kw">else </span>{
+                <span class="kw">break</span>;
+            }
+        }
+        <span class="kw-2">&amp;</span><span class="self">self</span>[byte_start..byte_end]
     }
-    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="ident">bound</span>) <span class="op">|</span> <span class="ident">Bound::Excluded</span>(<span class="ident">bound</span>) =&gt; <span class="kw-2">*</span><span class="ident">bound</span>,
-            <span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
+    <span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>, range: <span class="kw">impl </span>RangeBounds&lt;usize&gt;) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">let </span>start = <span class="kw">match </span>range.start_bound() {
+            Bound::Included(bound) | Bound::Excluded(bound) =&gt; <span class="kw-2">*</span>bound,
+            Bound::Unbounded =&gt; <span class="number">0</span>,
         };
         <span class="macro">log::debug!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>);
         <span class="macro">log::debug!</span>(<span class="string">&quot;start: {start}&quot;</span>);
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="ident">bound</span>) =&gt; <span class="kw-2">*</span><span class="ident">bound</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="ident">Bound::Excluded</span>(<span class="ident">bound</span>) =&gt; <span class="kw-2">*</span><span class="ident">bound</span>,
-            <span class="ident">Bound::Unbounded</span> =&gt; <span class="self">self</span>.<span class="ident">len</span>(),
-        } <span class="op">-</span> <span class="ident">start</span>;
+        <span class="kw">let </span>len = <span class="kw">match </span>range.end_bound() {
+            Bound::Included(bound) =&gt; <span class="kw-2">*</span>bound + <span class="number">1</span>,
+            Bound::Excluded(bound) =&gt; <span class="kw-2">*</span>bound,
+            Bound::Unbounded =&gt; <span class="self">self</span>.len(),
+        } - start;
         <span class="macro">log::debug!</span>(<span class="string">&quot;len {len}&quot;</span>);
-        <span class="self">self</span>.<span class="ident">substring</span>(<span class="ident">start</span>, <span class="ident">len</span>)
+        <span class="self">self</span>.substring(start, len)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">TemplateOnce</span>)]</span>
-<span class="attribute">#[<span class="ident">template</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;post.html&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">template</span>(<span class="ident">rm_whitespace</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Post</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">PostResp</span>,
-    <span class="kw">pub</span> <span class="ident">date</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">preview_img</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">reading_time</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">gists</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident"><span class="kw">crate</span>::data::GistContent</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">paragraphs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(TemplateOnce)]
+#[template(path = <span class="string">&quot;post.html&quot;</span>)]
+#[template(rm_whitespace = <span class="bool-val">true</span>)]
+</span><span class="kw">pub struct </span>Post {
+    <span class="kw">pub </span>data: PostResp,
+    <span class="kw">pub </span>date: String,
+    <span class="kw">pub </span>preview_img: String,
+    <span class="kw">pub </span>reading_time: usize,
+    <span class="kw">pub </span>id: String,
+    <span class="kw">pub </span>gists: <span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
+    <span class="kw">pub </span>paragraphs: Vec&lt;String&gt;,
 }
 
-<span class="kw">const</span> <span class="ident">INDEX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../templates/index.html&quot;</span>);
+<span class="kw">const </span>INDEX: <span class="kw-2">&amp;</span>str = <span class="macro">include_str!</span>(<span class="string">&quot;../templates/index.html&quot;</span>);
 
-<span class="attribute">#[<span class="ident">actix_web_codegen_const_routes::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.index&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">index</span>() -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
-    <span class="ident">HttpResponse::Ok</span>()
-        .<span class="ident">content_type</span>(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
-        .<span class="ident">body</span>(<span class="ident">INDEX</span>)
+<span class="attribute">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.index&quot;</span>)]
+</span><span class="kw">async fn </span>index() -&gt; <span class="kw">impl </span>Responder {
+    HttpResponse::Ok()
+        .content_type(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
+        .body(INDEX)
 }
 
-<span class="attribute">#[<span class="ident">actix_web_codegen_const_routes::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.asset&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">assets</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">data</span>
-        .<span class="ident">client</span>
-        .<span class="ident">get</span>(<span class="macro">format!</span>(<span class="string">&quot;https://miro.medium.com/{}&quot;</span>, <span class="ident">path</span>))
-        .<span class="ident">send</span>()
-        .<span class="kw">await</span>
-        .<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">headers</span>();
-    <span class="kw">let</span> <span class="ident">content_type</span> <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">get</span>(<span class="ident">CONTENT_TYPE</span>).<span class="ident">unwrap</span>();
-    <span class="ident">HttpResponse::Ok</span>()
-        .<span class="ident">insert_header</span>(<span class="ident">header::CacheControl</span>(<span class="macro">vec!</span>[
-            <span class="ident">header::CacheDirective::Public</span>,
-            <span class="ident">header::CacheDirective::Extension</span>(<span class="string">&quot;immutable&quot;</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>),
-            <span class="ident">header::CacheDirective::MaxAge</span>(<span class="ident">CACHE_AGE</span>),
+<span class="attribute">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.asset&quot;</span>)]
+</span><span class="kw">async fn </span>assets(path: web::Path&lt;String&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
+    <span class="kw">let </span>res = data
+        .client
+        .get(<span class="macro">format!</span>(<span class="string">&quot;https://miro.medium.com/{}&quot;</span>, path))
+        .send()
+        .<span class="kw">await
+        </span>.unwrap();
+    <span class="kw">let </span>headers = res.headers();
+    <span class="kw">let </span>content_type = headers.get(CONTENT_TYPE).unwrap();
+    HttpResponse::Ok()
+        .insert_header(header::CacheControl(<span class="macro">vec!</span>[
+            header::CacheDirective::Public,
+            header::CacheDirective::Extension(<span class="string">&quot;immutable&quot;</span>.into(), <span class="prelude-val">None</span>),
+            header::CacheDirective::MaxAge(CACHE_AGE),
         ]))
-        .<span class="ident">content_type</span>(<span class="ident">content_type</span>)
-        .<span class="ident">body</span>(<span class="ident">res</span>.<span class="ident">bytes</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>())
+        .content_type(content_type)
+        .body(res.bytes().<span class="kw">await</span>.unwrap())
 }
 
-<span class="attribute">#[<span class="ident">actix_web_codegen_const_routes::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.by_post_id&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">by_post_id</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
-    <span class="kw">let</span> <span class="ident">post_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_post_light</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="kw">await</span>;
-    <span class="ident">HttpResponse::Found</span>()
-        .<span class="ident">append_header</span>((
-            <span class="ident">header::LOCATION</span>,
-            <span class="ident"><span class="kw">crate</span>::V1_API_ROUTES</span>
-                .<span class="ident">proxy</span>
-                .<span class="ident">get_page</span>(<span class="kw-2">&amp;</span><span class="ident">post_data</span>.<span class="ident">username</span>, <span class="kw-2">&amp;</span><span class="ident">post_data</span>.<span class="ident">slug</span>),
+<span class="attribute">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.by_post_id&quot;</span>)]
+</span><span class="kw">async fn </span>by_post_id(path: web::Path&lt;String&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
+    <span class="kw">let </span>post_data = data.get_post_light(<span class="kw-2">&amp;</span>path).<span class="kw">await</span>;
+    HttpResponse::Found()
+        .append_header((
+            header::LOCATION,
+            <span class="kw">crate</span>::V1_API_ROUTES
+                .proxy
+                .get_page(<span class="kw-2">&amp;</span>post_data.username, <span class="kw-2">&amp;</span>post_data.slug),
         ))
-        .<span class="ident">finish</span>()
+        .finish()
 }
 
-<span class="attribute">#[<span class="ident">actix_web_codegen_const_routes::get</span>(<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;crate::V1_API_ROUTES.proxy.page&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">page</span>(<span class="ident">path</span>: <span class="ident">web::Path</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span>, <span class="ident">data</span>: <span class="ident">AppData</span>) -&gt; <span class="kw">impl</span> <span class="ident">Responder</span> {
-    <span class="kw">let</span> <span class="ident">post_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="number">1</span>.<span class="ident">split</span>(<span class="string">&#39;-&#39;</span>).<span class="ident">last</span>();
-    <span class="kw">if</span> <span class="ident">post_id</span>.<span class="ident">is_none</span>() {
-        <span class="kw">return</span> <span class="ident">HttpResponse::BadRequest</span>().<span class="ident">finish</span>();
+<span class="attribute">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.page&quot;</span>)]
+</span><span class="kw">async fn </span>page(path: web::Path&lt;(String, String)&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
+    <span class="kw">let </span>post_id = path.<span class="number">1</span>.split(<span class="string">&#39;-&#39;</span>).last();
+    <span class="kw">if </span>post_id.is_none() {
+        <span class="kw">return </span>HttpResponse::BadRequest().finish();
     }
-    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">post_id</span>.<span class="ident">unwrap</span>();
+    <span class="kw">let </span>id = post_id.unwrap();
 
-    <span class="kw">let</span> <span class="ident">post_data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_post</span>(<span class="ident">id</span>).<span class="kw">await</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">futs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">paragraphs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">post_data</span>.<span class="ident">content</span>.<span class="ident">body_model</span>.<span class="ident">paragraphs</span>;
+    <span class="kw">let </span>post_data = data.get_post(id).<span class="kw">await</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>futs = Vec::new();
+    <span class="kw">let </span>paragraphs = <span class="kw-2">&amp;</span>post_data.content.body_model.paragraphs;
 
-    <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">paragraphs</span>.<span class="ident">iter</span>() {
-        <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">type_</span> <span class="op">==</span> <span class="string">&quot;IFRAME&quot;</span> {
-            <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">p</span>
-                .<span class="ident">iframe</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">media_resource</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">href</span>;
-            <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">contains</span>(<span class="string">&quot;gist.github.com&quot;</span>) {
-                <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">get_gist</span>(<span class="ident">src</span>.<span class="ident">to_owned</span>());
-                <span class="ident">futs</span>.<span class="ident">push</span>(<span class="ident">fut</span>);
+    <span class="kw">for </span>p <span class="kw">in </span>paragraphs.iter() {
+        <span class="kw">if </span>p.type_ == <span class="string">&quot;IFRAME&quot; </span>{
+            <span class="kw">let </span>src = <span class="kw-2">&amp;</span>p
+                .iframe
+                .as_ref()
+                .unwrap()
+                .media_resource
+                .as_ref()
+                .unwrap()
+                .href;
+            <span class="kw">if </span>src.contains(<span class="string">&quot;gist.github.com&quot;</span>) {
+                <span class="kw">let </span>fut = data.get_gist(src.to_owned());
+                futs.push(fut);
             }
         }
     }
-    <span class="kw">let</span> <span class="ident">gists</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">futs</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">join_all</span>(<span class="ident">futs</span>).<span class="kw">await</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">x</span>)
+    <span class="kw">let </span>gists = <span class="kw">if </span>futs.is_empty() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="kw">let </span>x = join_all(futs).<span class="kw">await</span>;
+        <span class="prelude-val">Some</span>(x)
     };
 
-    <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Utc</span>
-        .<span class="ident">timestamp_millis</span>(<span class="ident">post_data</span>.<span class="ident">created_at</span>)
-        .<span class="ident">format</span>(<span class="string">&quot;%b %e, %Y&quot;</span>)
-        .<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="ident">reading_time</span> <span class="op">=</span> <span class="ident">post_data</span>.<span class="ident">reading_time</span>.<span class="ident">floor</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">let</span> <span class="ident">preview_img</span> <span class="op">=</span> <span class="ident">post_data</span>
-        .<span class="ident">preview_image</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">id</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">preview_img</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::V1_API_ROUTES</span>.<span class="ident">proxy</span>.<span class="ident">get_medium_asset</span>(<span class="ident">preview_img</span>);
+    <span class="kw">let </span>date = Utc
+        .timestamp_millis(post_data.created_at)
+        .format(<span class="string">&quot;%b %e, %Y&quot;</span>)
+        .to_string();
+    <span class="kw">let </span>reading_time = post_data.reading_time.floor() <span class="kw">as </span>usize;
+    <span class="kw">let </span>preview_img = post_data
+        .preview_image
+        .as_ref()
+        .unwrap()
+        .id
+        .as_ref()
+        .unwrap();
+    <span class="kw">let </span>preview_img = <span class="kw">crate</span>::V1_API_ROUTES.proxy.get_medium_asset(preview_img);
 
-    <span class="kw">let</span> <span class="ident">paragraphs</span> <span class="op">=</span> <span class="ident">apply_markup</span>(<span class="kw-2">&amp;</span><span class="ident">post_data</span>, <span class="kw-2">&amp;</span><span class="ident">gists</span>);
+    <span class="kw">let </span>paragraphs = apply_markup(<span class="kw-2">&amp;</span>post_data, <span class="kw-2">&amp;</span>gists);
 
-    <span class="kw">let</span> <span class="ident">page</span> <span class="op">=</span> <span class="ident">Post</span> {
-        <span class="ident">id</span>: <span class="ident">id</span>.<span class="ident">to_owned</span>(),
-        <span class="ident">data</span>: <span class="ident">post_data</span>,
-        <span class="ident">date</span>,
-        <span class="ident">gists</span>,
-        <span class="ident">reading_time</span>,
-        <span class="ident">preview_img</span>,
-        <span class="ident">paragraphs</span>,
+    <span class="kw">let </span>page = Post {
+        id: id.to_owned(),
+        data: post_data,
+        date,
+        gists,
+        reading_time,
+        preview_img,
+        paragraphs,
     };
 
-    <span class="kw">let</span> <span class="ident">page</span> <span class="op">=</span> <span class="ident">page</span>.<span class="ident">render_once</span>().<span class="ident">unwrap</span>();
-    <span class="ident">HttpResponse::Ok</span>()
-        .<span class="ident">content_type</span>(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
-        .<span class="ident">body</span>(<span class="ident">page</span>)
+    <span class="kw">let </span>page = page.render_once().unwrap();
+    HttpResponse::Ok()
+        .content_type(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
+        .body(page)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">services</span>(<span class="ident">cfg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">web::ServiceConfig</span>) {
-    <span class="ident">cfg</span>.<span class="ident">service</span>(<span class="ident">by_post_id</span>);
-    <span class="ident">cfg</span>.<span class="ident">service</span>(<span class="ident">assets</span>);
-    <span class="ident">cfg</span>.<span class="ident">service</span>(<span class="ident">page</span>);
-    <span class="ident">cfg</span>.<span class="ident">service</span>(<span class="ident">index</span>);
+<span class="kw">pub fn </span>services(cfg: <span class="kw-2">&amp;mut </span>web::ServiceConfig) {
+    cfg.service(by_post_id);
+    cfg.service(assets);
+    cfg.service(page);
+    cfg.service(index);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">actix_web</span>::{<span class="ident">http::StatusCode</span>, <span class="ident">test</span>, <span class="ident">App</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>actix_web::{http::StatusCode, test, App};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">routes::services</span>, <span class="ident">Data</span>};
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use crate</span>::{routes::services, Data};
 
-    <span class="attribute">#[<span class="ident">actix_rt::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">deploy_update_works</span>() {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Data::new</span>();
-        <span class="kw">let</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">test::init_service</span>(<span class="ident">App::new</span>().<span class="ident">app_data</span>(<span class="ident">data</span>.<span class="ident">clone</span>()).<span class="ident">configure</span>(<span class="ident">services</span>)).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">urls</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[actix_rt::test]
+    </span><span class="kw">async fn </span>deploy_update_works() {
+        <span class="kw">let </span>data = Data::new();
+        <span class="kw">let </span>app = test::init_service(App::new().app_data(data.clone()).configure(services)).<span class="kw">await</span>;
+        <span class="kw">let </span>urls = <span class="macro">vec!</span>[
             <span class="string">&quot;/@ftrain/big-data-small-effort-b62607a43a8c&quot;</span>,
             <span class="string">&quot;/@shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8&quot;</span>,
             <span class="string">&quot;/&quot;</span>,
             <span class="string">&quot;/asset/medium/1*LY2ohYsNa9nOV1Clko3zJA.png&quot;</span>,
         ];
 
-        <span class="kw">for</span> <span class="ident">uri</span> <span class="kw">in</span> <span class="ident">urls</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span>
-                <span class="ident">test::call_service</span>(<span class="kw-2">&amp;</span><span class="ident">app</span>, <span class="ident">test::TestRequest::get</span>().<span class="ident">uri</span>(<span class="ident">uri</span>).<span class="ident">to_request</span>()).<span class="kw">await</span>;
-            <span class="macro">assert_eq!</span>(<span class="ident">resp</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::OK</span>);
+        <span class="kw">for </span>uri <span class="kw">in </span>urls.iter() {
+            <span class="kw">let </span>resp =
+                test::call_service(<span class="kw-2">&amp;</span>app, test::TestRequest::get().uri(uri).to_request()).<span class="kw">await</span>;
+            <span class="macro">assert_eq!</span>(resp.status(), StatusCode::OK);
         }
 
-        <span class="kw">let</span> <span class="ident">urls</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>urls = <span class="macro">vec!</span>[
             <span class="string">&quot;/ftrain/big-data-small-effort-b62607a43a8c&quot;</span>,
             <span class="string">&quot;/shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8&quot;</span>,
         ];
 
-        <span class="kw">for</span> <span class="ident">uri</span> <span class="kw">in</span> <span class="ident">urls</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">split</span>(<span class="string">&#39;-&#39;</span>).<span class="ident">last</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for </span>uri <span class="kw">in </span>urls.iter() {
+            <span class="kw">let </span>id = uri.split(<span class="string">&#39;-&#39;</span>).last().unwrap();
 
-            <span class="kw">let</span> <span class="ident">page_url</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::V1_API_ROUTES</span>.<span class="ident">proxy</span>.<span class="ident">by_post_id</span>.<span class="ident">replace</span>(<span class="string">&quot;{post}&quot;</span>, <span class="ident">id</span>);
+            <span class="kw">let </span>page_url = <span class="kw">crate</span>::V1_API_ROUTES.proxy.by_post_id.replace(<span class="string">&quot;{post}&quot;</span>, id);
 
-            <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span>
-                <span class="ident">test::call_service</span>(<span class="kw-2">&amp;</span><span class="ident">app</span>, <span class="ident">test::TestRequest::get</span>().<span class="ident">uri</span>(<span class="kw-2">&amp;</span><span class="ident">page_url</span>).<span class="ident">to_request</span>())
+            <span class="kw">let </span>resp =
+                test::call_service(<span class="kw-2">&amp;</span>app, test::TestRequest::get().uri(<span class="kw-2">&amp;</span>page_url).to_request())
                     .<span class="kw">await</span>;
-            <span class="macro">assert_eq!</span>(<span class="ident">resp</span>.<span class="ident">status</span>(), <span class="ident">StatusCode::FOUND</span>);
-            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">headers</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">headers</span>.<span class="ident">get</span>(<span class="ident">header::LOCATION</span>).<span class="ident">unwrap</span>(), <span class="ident">uri</span>);
+            <span class="macro">assert_eq!</span>(resp.status(), StatusCode::FOUND);
+            <span class="kw">let </span>headers = resp.headers();
+            <span class="macro">assert_eq!</span>(headers.get(header::LOCATION).unwrap(), uri);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libmedium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libmedium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
