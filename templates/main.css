@@ -184,3 +184,11 @@ ul {
   overflow-x: scroll;
   display: block;
 }
+
+.mixtape {
+  padding: 20px;
+  border: 1px solid gray;
+  display: flex;
+  align-items: center;
+  margin: 30px 0;
+}

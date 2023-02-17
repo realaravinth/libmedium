@@ -66,7 +66,7 @@ impl<'a, 'b> Markup<'a, 'b> {
             "<p>".into()
         } else if p.type_ == "PRE" {
             "<pre>".into()
-        } else if p.type_ == "BQ" {
+        } else if p.type_ == "BQ" || p.type_ == "PQ" {
             "<blockquote>".into()
         } else if p.type_ == "H1" {
             "<h1>".into()
@@ -133,8 +133,10 @@ impl<'a, 'b> Markup<'a, 'b> {
                 state.in_oli = true;
                 "<ol><li>".into()
             }
+        } else if p.type_ == "MIXTAPE_EMBED" {
+            "<div class='mixtape'><p>".into()
         } else {
-            log::info!("Unknown type");
+            log::info!("Unknown type: {}", p.type_);
             r#"
                 <p class="libmedium__meta">
                     <b>From LibMedium:</b> LibMedium is built by reverse
@@ -168,7 +170,7 @@ impl<'a, 'b> Markup<'a, 'b> {
             "</p>".into()
         } else if p.type_ == "PRE" {
             "</pre>".into()
-        } else if p.type_ == "BQ" {
+        } else if p.type_ == "BQ" || p.type_ == "PQ" {
             "</blockquote>".into()
         } else if p.type_ == "H1" {
             "</h1>".into()
@@ -203,6 +205,8 @@ impl<'a, 'b> Markup<'a, 'b> {
             }
         } else if p.type_ == "OLI" || p.type_ == "ULI" {
             "</li>".into()
+        } else if p.type_ == "MIXTAPE_EMBED" {
+            "</p></div>".into()
         } else {
             "</span>".into()
         };
