@@ -26,6 +26,20 @@ enum PostitionType {
     End,
 }
 
+struct ListState {
+    in_uli: bool,
+    in_oli: bool,
+}
+
+impl Default for ListState {
+    fn default() -> Self {
+        Self {
+            in_uli: false,
+            in_oli: false,
+        }
+    }
+}
+
 struct Markup<'a, 'b> {
     markup: &'a GetPostPostContentBodyModelParagraphsMarkups,
     p: &'a GetPostPostContentBodyModelParagraphs,
@@ -38,9 +52,10 @@ impl<'a, 'b> Markup<'a, 'b> {
         p: &GetPostPostContentBodyModelParagraphs,
         gists: &'b Option<Vec<(String, crate::data::GistContent)>>,
         pindex: usize,
-        in_oli: &mut bool,
+        state: &mut ListState,
     ) -> String {
-        if p.type_ == "IMG" {
+        let list = Self::list_close(p, state);
+        let resp = if p.type_ == "IMG" {
             let metadata = p.metadata.as_ref().unwrap();
             format!(
                 r#"<figure><img width="{}" src="{}" /> <figcaption>"#,
@@ -104,12 +119,19 @@ impl<'a, 'b> Markup<'a, 'b> {
             } else {
                 format!(r#"<iframe src="{src}" frameborder="0">"#)
             }
-        } else if p.type_ == "OLI" {
-            if *in_oli {
+        } else if p.type_ == "ULI" {
+            if state.in_uli {
                 "<li>".into()
             } else {
-                *in_oli = true;
+                state.in_uli = true;
                 "<ul><li>".into()
+            }
+        } else if p.type_ == "OLI" {
+            if state.in_oli {
+                "<li>".into()
+            } else {
+                state.in_oli = true;
+                "<ol><li>".into()
             }
         } else {
             log::info!("Unknown type");
@@ -127,10 +149,19 @@ impl<'a, 'b> Markup<'a, 'b> {
                   </p>
             <span>"#
                 .into()
+        };
+
+        match list {
+            Some(list) => format!("{list}{resp}"),
+            None => resp,
         }
     }
 
-    fn end(p: &GetPostPostContentBodyModelParagraphs, pindex: usize, in_oli: &mut bool) -> String {
+    fn end(
+        p: &GetPostPostContentBodyModelParagraphs,
+        pindex: usize,
+        state: &mut ListState,
+    ) -> String {
         let resp: String = if p.type_ == "IMG" {
             "</figcaption></figure>".into()
         } else if p.type_ == "P" {
@@ -170,14 +201,21 @@ impl<'a, 'b> Markup<'a, 'b> {
             } else {
                 "</iframe>".into()
             }
-        } else if p.type_ == "OLI" {
+        } else if p.type_ == "OLI" || p.type_ == "ULI" {
             "</li>".into()
         } else {
             "</span>".into()
         };
-        if *in_oli {
-            if p.type_ != "OLL" {
-                *in_oli = false;
+        if state.in_oli {
+            if p.type_ != "OLI" {
+                state.in_oli = false;
+                format!("</ol>{resp}")
+            } else {
+                resp
+            }
+        } else if state.in_uli {
+            if p.type_ != "ULI" {
+                state.in_uli = false;
                 format!("</ul>{resp}")
             } else {
                 resp
@@ -185,6 +223,25 @@ impl<'a, 'b> Markup<'a, 'b> {
         } else {
             resp
         }
+    }
+
+    fn list_close(
+        p: &GetPostPostContentBodyModelParagraphs,
+        state: &mut ListState,
+    ) -> Option<String> {
+        if state.in_oli {
+            if p.type_ != "OLI" {
+                state.in_oli = false;
+                return Some(format!("</ol>"));
+            }
+        };
+        if state.in_uli {
+            if p.type_ != "ULI" {
+                state.in_uli = false;
+                return Some(format!("</ul>"));
+            }
+        };
+        None
     }
 
     fn apply_markup(&self, pindex: usize) -> String {
@@ -295,6 +352,7 @@ pub fn apply_markup<'b>(
     gists: &'b Option<Vec<(String, crate::data::GistContent)>>,
 ) -> Vec<String> {
     let mut paragraphs: Vec<String> = Vec::with_capacity(data.content.body_model.paragraphs.len());
+    let mut state = ListState::default();
     for (pindex, p) in data.content.body_model.paragraphs.iter().enumerate() {
         let mut pos = PositionMap::default();
         if p.type_ == "H3" && pindex == 0 {
@@ -333,8 +391,7 @@ pub fn apply_markup<'b>(
         }
 
         let mut content = String::with_capacity(p.text.len());
-        let mut in_oli = false;
-        content += &Markup::start(&p, &gists, pindex, &mut in_oli);
+        content += &Markup::start(&p, &gists, pindex, &mut state);
         pos.arr.sort();
         if let Some(first) = pos.arr.get(0) {
             //content += p.text.substring(cur, *first as usize);
@@ -351,18 +408,17 @@ pub fn apply_markup<'b>(
                 //           }
                 let pos_markups = pos.map.get(point).unwrap();
                 for m in pos_markups.iter() {
-                    //                println!("{}", &m.apply_markup(pindex));
                     content += &m.apply_markup(pindex);
                 }
                 cur = incr_cur(cur, *point);
             }
             log::debug!("LAST");
             content += p.text.slice(cur..);
-            content += &Markup::end(&p, pindex, &mut in_oli);
+            content += &Markup::end(&p, pindex, &mut state);
         } else {
             log::debug!("LAST WITH NO MARKUP");
             content += p.text.slice(cur..);
-            content += &Markup::end(&p, pindex, &mut in_oli);
+            content += &Markup::end(&p, pindex, &mut state);
         }
         paragraphs.push(content);
     }
