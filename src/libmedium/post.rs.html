@@ -424,6 +424,10 @@
 <a href="#424" id="424">424</a>
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -492,7 +496,7 @@
             <span class="string">&quot;&lt;p&gt;&quot;</span>.into()
         } <span class="kw">else if </span>p.type_ == <span class="string">&quot;PRE&quot; </span>{
             <span class="string">&quot;&lt;pre&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;BQ&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;BQ&quot; </span>|| p.type_ == <span class="string">&quot;PQ&quot; </span>{
             <span class="string">&quot;&lt;blockquote&gt;&quot;</span>.into()
         } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H1&quot; </span>{
             <span class="string">&quot;&lt;h1&gt;&quot;</span>.into()
@@ -559,8 +563,10 @@
                 state.in_oli = <span class="bool-val">true</span>;
                 <span class="string">&quot;&lt;ol&gt;&lt;li&gt;&quot;</span>.into()
             }
+        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;MIXTAPE_EMBED&quot; </span>{
+            <span class="string">&quot;&lt;div class=&#39;mixtape&#39;&gt;&lt;p&gt;&quot;</span>.into()
         } <span class="kw">else </span>{
-            <span class="macro">log::info!</span>(<span class="string">&quot;Unknown type&quot;</span>);
+            <span class="macro">log::info!</span>(<span class="string">&quot;Unknown type: {}&quot;</span>, p.type_);
             <span class="string">r#&quot;
                 &lt;p class=&quot;libmedium__meta&quot;&gt;
                     &lt;b&gt;From LibMedium:&lt;/b&gt; LibMedium is built by reverse
@@ -594,7 +600,7 @@
             <span class="string">&quot;&lt;/p&gt;&quot;</span>.into()
         } <span class="kw">else if </span>p.type_ == <span class="string">&quot;PRE&quot; </span>{
             <span class="string">&quot;&lt;/pre&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;BQ&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;BQ&quot; </span>|| p.type_ == <span class="string">&quot;PQ&quot; </span>{
             <span class="string">&quot;&lt;/blockquote&gt;&quot;</span>.into()
         } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H1&quot; </span>{
             <span class="string">&quot;&lt;/h1&gt;&quot;</span>.into()
@@ -629,6 +635,8 @@
             }
         } <span class="kw">else if </span>p.type_ == <span class="string">&quot;OLI&quot; </span>|| p.type_ == <span class="string">&quot;ULI&quot; </span>{
             <span class="string">&quot;&lt;/li&gt;&quot;</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;MIXTAPE_EMBED&quot; </span>{
+            <span class="string">&quot;&lt;/p&gt;&lt;/div&gt;&quot;</span>.into()
         } <span class="kw">else </span>{
             <span class="string">&quot;&lt;/span&gt;&quot;</span>.into()
         };
