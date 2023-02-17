@@ -166,6 +166,8 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2022  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -222,10 +224,12 @@
         );
 
         <span class="comment">// highlighted_html_for_string(&amp;q.code, syntax_set, syntax_def, theme),
-        </span><span class="kw">let </span>html = SYNTAX_SET.with(|ss| {
-            <span class="kw">let </span>language = <span class="self">self</span>.determine_language(ss);
-            highlighted_html_for_string(<span class="self">self</span>.code, ss, language, theme)
-        });
+        </span><span class="kw">let </span>html = SYNTAX_SET
+            .with(|ss| {
+                <span class="kw">let </span>language = <span class="self">self</span>.determine_language(ss);
+                highlighted_html_for_string(<span class="self">self</span>.code, ss, language, theme)
+            })
+            .unwrap();
         <span class="kw">let </span>total_lines = html.lines().count();
         <span class="kw">for </span>(line_num, line) <span class="kw">in </span>html.lines().enumerate() {
             <span class="kw">if </span>!line.trim().is_empty() {
