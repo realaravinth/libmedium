@@ -4,6 +4,10 @@ default: ## Debug build
 clean: ## Clean all build artifacts and dependencies
 	@cargo clean
 
+check: ## Check for syntax errors on all workspaces
+	cargo check --workspace --tests --all-features
+	#cd utils/cache-bust && cargo check --tests --all-features
+
 coverage: ## Generate HTML code coverage
 	./scripts/coverage.sh --coverage
 	
