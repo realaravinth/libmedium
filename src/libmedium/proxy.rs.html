@@ -284,6 +284,14 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -567,6 +575,14 @@
             <span class="macro">assert_eq!</span>(resp.status(), StatusCode::FOUND);
             <span class="kw">let </span>headers = resp.headers();
             <span class="macro">assert_eq!</span>(headers.get(header::LOCATION).unwrap(), uri);
+
+            <span class="kw">let </span>url = <span class="string">&quot;/@tylerneely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c&quot;</span>;
+
+            <span class="kw">let </span>resp =
+                test::call_service(<span class="kw-2">&amp;</span>app, test::TestRequest::get().uri(url).to_request()).<span class="kw">await</span>;
+            <span class="macro">assert_eq!</span>(resp.status(), StatusCode::OK);
+            <span class="kw">let </span>res = String::from_utf8(test::read_body(resp).<span class="kw">await</span>.to_vec()).unwrap();
+            <span class="macro">assert!</span>(res.contains(<span class="macro">include_str!</span>(<span class="string">&quot;../tests/7158b1cdd50c.html&quot;</span>)));
         }
     }
 }

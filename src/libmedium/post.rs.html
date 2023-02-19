@@ -416,18 +416,6 @@
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
 </pre><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -444,7 +432,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
  */
-</span><span class="kw">use </span>std::{collections::HashMap, hash::Hash};
+</span><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span><span class="kw">crate</span>::data::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::proxy::StringUtils;
@@ -456,18 +444,10 @@
     End,
 }
 
-<span class="kw">struct </span>ListState {
+<span class="attr">#[derive(Default, Eq, PartialEq)]
+</span><span class="kw">struct </span>ListState {
     in_uli: bool,
     in_oli: bool,
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>ListState {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            in_uli: <span class="bool-val">false</span>,
-            in_oli: <span class="bool-val">false</span>,
-        }
-    }
 }
 
 <span class="kw">struct </span>Markup&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
@@ -663,22 +643,18 @@
         p: <span class="kw-2">&amp;</span>GetPostPostContentBodyModelParagraphs,
         state: <span class="kw-2">&amp;mut </span>ListState,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">if </span>state.in_oli {
-            <span class="kw">if </span>p.type_ != <span class="string">&quot;OLI&quot; </span>{
-                state.in_oli = <span class="bool-val">false</span>;
-                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;&lt;/ol&gt;&quot;</span>));
-            }
+        <span class="kw">if </span>state.in_oli &amp;&amp; p.type_ != <span class="string">&quot;OLI&quot; </span>{
+            state.in_oli = <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="string">&quot;&lt;/ol&gt;&quot;</span>.to_string());
         };
-        <span class="kw">if </span>state.in_uli {
-            <span class="kw">if </span>p.type_ != <span class="string">&quot;ULI&quot; </span>{
-                state.in_uli = <span class="bool-val">false</span>;
-                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;&lt;/ul&gt;&quot;</span>));
-            }
+        <span class="kw">if </span>state.in_uli &amp;&amp; p.type_ != <span class="string">&quot;ULI&quot; </span>{
+            state.in_uli = <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="string">&quot;&lt;/ul&gt;&quot;</span>.to_string());
         };
         <span class="prelude-val">None
     </span>}
 
-    <span class="kw">fn </span>apply_markup(<span class="kw-2">&amp;</span><span class="self">self</span>, pindex: usize) -&gt; String {
+    <span class="kw">fn </span>apply_markup(<span class="kw-2">&amp;</span><span class="self">self</span>, _pindex: usize) -&gt; String {
         <span class="kw">if </span><span class="self">self</span>.markup.type_ == <span class="string">&quot;A&quot; </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(anchor_type) = <span class="kw-2">&amp;</span><span class="self">self</span>.markup.anchor_type {
                 <span class="kw">if </span>anchor_type == <span class="string">&quot;LINK&quot; </span>{
@@ -781,9 +757,9 @@
     }
 }
 
-<span class="kw">pub fn </span>apply_markup&lt;<span class="lifetime">&#39;b</span>&gt;(
+<span class="kw">pub fn </span>apply_markup(
     data: <span class="kw-2">&amp;</span>PostResp,
-    gists: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
+    gists: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
 ) -&gt; Vec&lt;String&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>paragraphs: Vec&lt;String&gt; = Vec::with_capacity(data.content.body_model.paragraphs.len());
     <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
@@ -795,14 +771,14 @@
         }
         <span class="kw">for </span>m <span class="kw">in </span>p.markups.iter() {
             <span class="kw">let </span>start_markup = Markup {
-                markup: <span class="kw-2">&amp;</span>m,
+                markup: m,
                 p,
                 gists,
                 pos_type: PostitionType::Start,
             };
             pos.insert_if_not_exists(m.start, start_markup);
             <span class="kw">let </span>end_markup = Markup {
-                markup: <span class="kw-2">&amp;</span>m,
+                markup: m,
                 p,
                 gists,
                 pos_type: PostitionType::End,
@@ -825,9 +801,9 @@
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>content = String::with_capacity(p.text.len());
-        content += <span class="kw-2">&amp;</span>Markup::start(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>gists, pindex, <span class="kw-2">&amp;mut </span>state);
+        content += <span class="kw-2">&amp;</span>Markup::start(p, gists, pindex, <span class="kw-2">&amp;mut </span>state);
         pos.arr.sort();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(first) = pos.arr.get(<span class="number">0</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(first) = pos.arr.first() {
             <span class="comment">//content += p.text.substring(cur, *first as usize);
             </span>content += p.text.slice(cur..<span class="kw-2">*</span>first <span class="kw">as </span>usize);
             cur = incr_cur(cur, <span class="kw-2">*</span>first);
@@ -848,11 +824,11 @@
             }
             <span class="macro">log::debug!</span>(<span class="string">&quot;LAST&quot;</span>);
             content += p.text.slice(cur..);
-            content += <span class="kw-2">&amp;</span>Markup::end(<span class="kw-2">&amp;</span>p, pindex, <span class="kw-2">&amp;mut </span>state);
+            content += <span class="kw-2">&amp;</span>Markup::end(p, pindex, <span class="kw-2">&amp;mut </span>state);
         } <span class="kw">else </span>{
             <span class="macro">log::debug!</span>(<span class="string">&quot;LAST WITH NO MARKUP&quot;</span>);
             content += p.text.slice(cur..);
-            content += <span class="kw-2">&amp;</span>Markup::end(<span class="kw-2">&amp;</span>p, pindex, <span class="kw-2">&amp;mut </span>state);
+            content += <span class="kw-2">&amp;</span>Markup::end(p, pindex, <span class="kw-2">&amp;mut </span>state);
         }
         paragraphs.push(content);
     }
