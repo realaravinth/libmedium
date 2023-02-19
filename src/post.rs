@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use crate::data::*;
 use crate::proxy::StringUtils;
@@ -26,18 +26,10 @@ enum PostitionType {
     End,
 }
 
+#[derive(Default, Eq, PartialEq)]
 struct ListState {
     in_uli: bool,
     in_oli: bool,
-}
-
-impl Default for ListState {
-    fn default() -> Self {
-        Self {
-            in_uli: false,
-            in_oli: false,
-        }
-    }
 }
 
 struct Markup<'a, 'b> {
@@ -233,22 +225,18 @@ impl<'a, 'b> Markup<'a, 'b> {
         p: &GetPostPostContentBodyModelParagraphs,
         state: &mut ListState,
     ) -> Option<String> {
-        if state.in_oli {
-            if p.type_ != "OLI" {
-                state.in_oli = false;
-                return Some(format!("</ol>"));
-            }
+        if state.in_oli && p.type_ != "OLI" {
+            state.in_oli = false;
+            return Some("</ol>".to_string());
         };
-        if state.in_uli {
-            if p.type_ != "ULI" {
-                state.in_uli = false;
-                return Some(format!("</ul>"));
-            }
+        if state.in_uli && p.type_ != "ULI" {
+            state.in_uli = false;
+            return Some("</ul>".to_string());
         };
         None
     }
 
-    fn apply_markup(&self, pindex: usize) -> String {
+    fn apply_markup(&self, _pindex: usize) -> String {
         if self.markup.type_ == "A" {
             if let Some(anchor_type) = &self.markup.anchor_type {
                 if anchor_type == "LINK" {
@@ -351,9 +339,9 @@ impl<'a, 'b> PositionMap<'a, 'b> {
     }
 }
 
-pub fn apply_markup<'b>(
+pub fn apply_markup(
     data: &PostResp,
-    gists: &'b Option<Vec<(String, crate::data::GistContent)>>,
+    gists: &Option<Vec<(String, crate::data::GistContent)>>,
 ) -> Vec<String> {
     let mut paragraphs: Vec<String> = Vec::with_capacity(data.content.body_model.paragraphs.len());
     let mut state = ListState::default();
@@ -365,14 +353,14 @@ pub fn apply_markup<'b>(
         }
         for m in p.markups.iter() {
             let start_markup = Markup {
-                markup: &m,
+                markup: m,
                 p,
                 gists,
                 pos_type: PostitionType::Start,
             };
             pos.insert_if_not_exists(m.start, start_markup);
             let end_markup = Markup {
-                markup: &m,
+                markup: m,
                 p,
                 gists,
                 pos_type: PostitionType::End,
@@ -395,9 +383,9 @@ pub fn apply_markup<'b>(
         }
 
         let mut content = String::with_capacity(p.text.len());
-        content += &Markup::start(&p, &gists, pindex, &mut state);
+        content += &Markup::start(p, gists, pindex, &mut state);
         pos.arr.sort();
-        if let Some(first) = pos.arr.get(0) {
+        if let Some(first) = pos.arr.first() {
             //content += p.text.substring(cur, *first as usize);
             content += p.text.slice(cur..*first as usize);
             cur = incr_cur(cur, *first);
@@ -418,11 +406,11 @@ pub fn apply_markup<'b>(
             }
             log::debug!("LAST");
             content += p.text.slice(cur..);
-            content += &Markup::end(&p, pindex, &mut state);
+            content += &Markup::end(p, pindex, &mut state);
         } else {
             log::debug!("LAST WITH NO MARKUP");
             content += p.text.slice(cur..);
-            content += &Markup::end(&p, pindex, &mut state);
+            content += &Markup::end(p, pindex, &mut state);
         }
         paragraphs.push(content);
     }

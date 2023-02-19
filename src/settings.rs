@@ -95,7 +95,7 @@ impl Settings {
         let cache_path = settings.cache.as_ref().unwrap();
         let cache_path = Path::new(&cache_path);
         if !cache_path.exists() {
-            fs::create_dir(&cache_path).unwrap();
+            fs::create_dir(cache_path).unwrap();
         }
         if !cache_path.is_dir() {
             panic!(
