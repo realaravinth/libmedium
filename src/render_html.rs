@@ -54,10 +54,12 @@ impl<'a> SourcegraphQuery<'a> {
         );
 
         // highlighted_html_for_string(&q.code, syntax_set, syntax_def, theme),
-        let html = SYNTAX_SET.with(|ss| {
-            let language = self.determine_language(ss);
-            highlighted_html_for_string(self.code, ss, language, theme)
-        });
+        let html = SYNTAX_SET
+            .with(|ss| {
+                let language = self.determine_language(ss);
+                highlighted_html_for_string(self.code, ss, language, theme)
+            })
+            .unwrap();
         let total_lines = html.lines().count();
         for (line_num, line) in html.lines().enumerate() {
             if !line.trim().is_empty() {

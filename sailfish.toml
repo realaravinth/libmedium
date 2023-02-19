@@ -1,0 +1,3 @@
+delimiter= "."
+[optimizations]
+rm_whitespace= true
