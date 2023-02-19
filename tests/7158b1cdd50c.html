@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Fear and Loathing in Lock-Free Programming | by Tyler Neely | Sep 27, 2017</title>
+<meta charset="utf-8" />
+<meta
+name="viewport"
+content="width=device-width,minimum-scale=1,initial-scale=1,maximum-scale=1"
+/>
+<meta name="theme-color" content="#000000" />
+<meta name="twitter:app:name:iphone" content="libmedium" />
+<meta property="og:site_name" content="libmedium" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-21T10:54:12.523Z" />
+<meta
+name="title"
+content="Moscow state university network built by students | by Pavel Safronov | Oct, 2021 | libmedium"
+/>
+<meta property="og:title" content="Fear and Loathing in Lock-Free Programming" />
+<meta property="twitter:title" content="Fear and Loathing in Lock-Free Programming" />
+<meta name="twitter:app:url:iphone" content="medium://p/211539855cf9" />
+<meta data-rh="true" property="al:android:app_name" content="libmedium" />
+<meta name="description" content="What follows is a whirlwind tour of an area of programming usually only whispered of and seldom explored, perhaps for good reason…" />
+<meta property="og:description" content="What follows is a whirlwind tour of an area of programming usually only whispered of and seldom explored, perhaps for good reason…" />
+<meta property="twitter:description" content="What follows is a whirlwind tour of an area of programming usually only whispered of and seldom explored, perhaps for good reason…" />
+<meta
+property="og:url"
+content="http://localhost/Tyler Neely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c"
+/>
+<meta property="og:image" content="/asset/medium/1*ImXIA0dmgvgTRjiSisY-HQ.jpeg" />
+<meta name="twitter:image:src" content="/asset/medium/1*ImXIA0dmgvgTRjiSisY-HQ.jpeg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta
+property="article:author"
+content="https://medium.com/@5145b6327de1"
+/>
+<!--
+<meta name="twitter:creator" content="@username" />
+-->
+<meta name="author" content="Tyler Neely" />
+<meta
+data-rh="true"
+name="robots"
+content="index,follow,max-image-preview:large"
+/>
+<meta name="twitter:label1" content="Reading time" />
+<meta name="twitter:data1" content="15min read" />
+<!--
+<link
+rel="apple-touch-icon"
+sizes="152x152"
+href="https://miro.medium.com/fit/c/152/152/1*sHhtYhaCe2Uc3IU0IgKwIQ.png"
+/>
+<link
+rel="apple-touch-icon"
+sizes="120x120"
+href="https://miro.medium.com/fit/c/120/120/1*sHhtYhaCe2Uc3IU0IgKwIQ.png"
+/>
+<link
+rel="apple-touch-icon"
+sizes="76x76"
+href="https://miro.medium.com/fit/c/76/76/1*sHhtYhaCe2Uc3IU0IgKwIQ.png"
+/>
+<link
+rel="apple-touch-icon"
+sizes="60x60"
+href="https://miro.medium.com/fit/c/60/60/1*sHhtYhaCe2Uc3IU0IgKwIQ.png"
+/>
+<link
+rel="mask-icon"
+href="https://cdn-static-1.medium.com/_/fp/icons/libmedium-Avatar-500x500.svg"
+color="#171717"
+/>
+-->
+<link rel="author" href="https://medium.com/Tyler Neely" />
+<link
+rel="canonical"
+href="http://localhost/Tyler Neely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c"
+/>
+</head>
+<body>
+
+<main class="container">
+<h1>Fear and Loathing in Lock-Free Programming</h1>
+<p class="meta">
+<a class="author" href="https://medium.com/u/5145b6327de1" rel="noreferrer">
+<img
+src="https://miro.medium.com/1*O4KHGpH9QQ0mYamqf_76yA.jpeg"
+class="author__photo"
+alt="Tyler Neely"
+/>
+Tyler Neely</a
+>
+on Sep 27, 2017 &#183; 15 min read &#183;&nbsp;
+<a class="medium__source"
+href="https://medium.com/5145b6327de1/fear-and-loathing-in-lock-free-programming-7158b1cdd50c"
+rel="noreferrer"> Open post in medium.com</a>
+</p>
+<article>
+
+<figure><img width="800" src="/asset/medium/1*ImXIA0dmgvgTRjiSisY-HQ.jpeg" /> <figcaption></figcaption></figure>
+
+<p>What follows is a whirlwind tour of an area of programming usually only whispered of and seldom explored, perhaps for good reason. Lock-free techniques allow multiple threads to work together in a non-blocking way, often achieving incredible performance. As the name suggests, locks are not used. If the idea of a multithreaded program without mutexes makes you uncomfortable, you are quite sane.</p>
+
+<p>Yet lock-free systems are pervasive. Some memory allocators rely on a lock-free radix tree at their core, such as jemalloc. If you have used a queue or channel to communicate between threads, there’s an excellent chance the underlying structure was lock-free. If you have used a language with atomic reference counters, there are lock-free techniques employed throughout the lifetime of objects that use them. Even <a rel="noreferrer" href="http://www.seastar-project.org/">high-performance databases</a> that avoid the overhead of concurrent structures in their data path <a rel="noreferrer" href="https://github.com/scylladb/seastar/blob/c62bbf9ca7b8a09941586e40645177fcf1bffd72/core/reactor.hh#L295">still usually rely on a lock-free queue of some sort</a> to communicate across threads.</p>
+
+<p>Most respectable engineers know to avoid lock-free techniques at all costs. Just like threading, distributed systems or any of the myriad human productivity sinks that are better sidestepped with a refactor or more powerful hardware. If you can use one thread, you should.</p>
+
+<p>Single-threaded systems are infinitely easier to reason about, will have fewer bugs, and usually have better per-thread performance anyway due to not needing to block on a mutex or disrupt CPU progress with memory barriers. When you must use concurrency, you can sometimes get comparable or better performance than lock-free techniques by using fine-grained mutexes.</p>
+
+<p>As someone who finds bugs in systems for fun and profit (occasionally successfully!) <strong>let me be clear</strong>:</p>
+
+<figure><img width="1000" src="/asset/medium/1*MbItv9J5KMGqnpMlUmgQZA.jpeg" /> <figcaption>Say no to lock-free algorithms! Say yes to pizza!</figcaption></figure>
+
+<p>Artisanal lock-free algorithms are symptomatic of a long chain of bad decisions. They are almost impossible to correctly write. As far as I can tell, there are only <a rel="noreferrer" href="http://www.1024cores.net/">two</a> <a rel="noreferrer" href="https://www.youtube.com/watch?v=c1gO9aB9nbs">people</a> who actually know how to write them. These algorithms are extremely difficult to reason about, and you will be forever haunted by the real possibility that you missed some critical assumption.</p>
+
+<p>Lock-free algorithms often require knowledge of <a rel="noreferrer" href="https://www.learntla.com/introduction/example/">obscure tooling</a> to verify, and usually violate <a rel="noreferrer" href="https://mechanical-sympathy.blogspot.de/2011/09/single-writer-principle.html">the single-writer principle</a>. If you’re lucky enough to have found a bug you created, it could be quite challenging to reproduce it. Sometimes in mailing lists you see stuff like “I ran it for 38 hours on a test cluster and it didn’t blow up, but I just thought of this theoretical edge case I haven’t been able to reproduce yet and I think may be possible.” (I’ll cover the issues of exhaustive and deterministic testing in a future post featuring using ptrace and some tricks I found in a shady exploit crafter’s toolbox to tease out bugs!)</p>
+
+<p>So, without further ado, let’s ignore our better judgement and light ourselves on fire!</p>
+
+<h3>Lock-Free 101</h3>
+
+<p>In lock-free programming, we don’t use mutexes. Too safe, they say. Too luxurious an abstraction for the bleeding edge. Some folks go so far as to <strong>intentionally</strong> trigger <a rel="noreferrer" href="https://www.youtube.com/watch?v=3LcNHxBJw2Q">race conditions</a> or <a rel="noreferrer" href="http://www.artima.com/lejava/articles/azul_pauseless_gc.html">dangling pointers</a> just to get high on performance. The depravity in this world runs deep…</p>
+
+<h4>Roadmap</h4>
+
+<p>Atomic operations will be our gateway drug. We will advance through spinlocks, stacks and transactions. A typical tale of overindulgence before crashing hard, being dealt a harsh lesson in the ABA problem and finally ending up in a 8-step responsible implementation program.</p>
+
+<p>Please note that some of my examples come from the world of distributed systems, which I am more familiar with, although the (utterly depraved) mindset is generally similar.</p>
+
+<h4>Atomic Operations</h4>
+
+<p>Atomicity, for the purposes of this article, can be interpreted to mean indivisible, uninterruptible, and either 100% successful or 100% unsuccessful. It is impossible to witness a half-complete atomic operation. Examples of things that are atomic are database transactions (<a rel="noreferrer" href="https://github.com/ept/hermitage">but not always as you expect</a>), <a rel="noreferrer" href="https://rcrowley.org/2010/01/06/things-unix-can-do-atomically.html">the <code>mv</code> command</a> found on most unix-like systems, breaking a glass window (it’s either broken or not, never something in-between), etc…</p>
+
+<p>Several of the most popular CPU architectures have instructions that let you atomically set memory to a new value conditionally if you know the current value. This is called “test and set” (TAS), “compare and swap”, or “compare and set” (CAS). The hardware makes sure that only one thread “wins” if several threads attempt a CAS at the same time. All others are unsuccessful. The return value varies across implementations, but a good implementation clearly indicates success or failure.</p>
+
+<p><code>CAS(variable, old, new)</code> is the shorthand I will use. If <code>variable </code>is set to <code>0</code> then <code>CAS(variable, 0, 1)</code> would succeed, as long as another thread didn’t change the value while we weren’t looking. Then <code>CAS(variable, 1, 0)</code> would set it back. But <code>CAS(variable, "hot garbage", 0)</code> would not work unless one of our thread friends has given <code>variable</code>a surprise hot-garbage makeover ;) If several threads try to do <code>CAS(variable, 0, 1)</code> at the same time when the value was set to <code>0</code>, only one of them will succeed.</p>
+
+<p>The amount of data that CAS can operate on is usually limited to the “word size” of the system it’s running on, which is usually the same as the length of a memory address. F̶o̶r̶ ̶x̶8̶6̶_̶6̶4̶,̶ ̶y̶o̶u̶’̶r̶e̶ ̶s̶t̶u̶c̶k̶ ̶w̶i̶t̶h̶ ̶a̶t̶ ̶m̶o̶s̶t̶ ̶6̶4̶ ̶b̶i̶t̶s̶ ̶o̶f̶ ̶c̶o̶m̶p̶a̶r̶a̶t̶i̶v̶e̶ ̶p̶o̶w̶e̶r̶. (edit: x86_64 actually <a rel="noreferrer" href="http://www.felixcloutier.com/x86/CMPXCHG8B:CMPXCHG16B.html">has a 128-bit CAS</a>, although it’s not available from languages like Go, Java, or Rust. Thanks <a rel="noreferrer" href="https://lobste.rs/u/robgssp">robgssp</a>!) 32-bit architectures often have a double-word “DCAS” that can work on 64 bits. But one word is usually sufficient for use with pointers, counters, bit-packed headers, and all kinds of interesting stuff.</p>
+
+<p>One sees some really creative uses of space in the lock-free world, it reminds me of the clever tricks people do in the <a rel="noreferrer" href="https://en.wikipedia.org/wiki/Demoscene">Demoscene</a> to squeeze every last drop of functionality out of a single bit. But this often imposes limits on portability. I’ll touch on some creative ways to use the few bits CAS can compare in the <a rel="noreferrer" href="#808e">Mitigating ABA</a> section below.</p>
+
+<p>And yet, CAS is an extremely powerful primitive! More than enough rope to hang ourselves with! Let’s build a teetering tower of abstractions that could collapse at any second with the slightest misplaced assumption!</p>
+
+<h4>A Simple Spinlock</h4>
+
+<p>We can gaze into our past lives of locked leisure by implementing a spinlock in just a few lines. This is not a lock-free algorithm because threads will block until the lock is acquired, but it will illustrate the idea of threads coordinating by using atomic operations. We will spin in a loop until we can successfully change a lock variable from unlocked to locked. Only one thread will be granted exclusive access at a time! <em>Assuming we didn’t accidentally create a spy…</em></p>
+
+<div class="gist_container"><div class="code-block gist-block"><style>
+        .gist_file {
+            background-color:#ffffff;
+        }</style><pre style="background-color:#ffffff;"><div title='click for more options' id="line-1"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-1"<span class="line-number">1</span></a><span style="font-weight:bold;color:#a71d5d;">package</span><span style="color:#323232;"> main</summary><a href="#line-1"<span class="line-link">Permanant link</span></a><a href="#line-1"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-2"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-2"<span class="line-number">2</span></a></span><span style="color:#323232;"></summary><a href="#line-2"<span class="line-link">Permanant link</span></a><a href="#line-2"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-3"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-3"<span class="line-number">3</span></a></span><span style="font-weight:bold;color:#a71d5d;">import </span><span style="color:#323232;">(</summary><a href="#line-3"<span class="line-link">Permanant link</span></a><a href="#line-3"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-4"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-4"<span class="line-number">4</span></a></span><span style="color:#323232;">	</span><span style="color:#183691;">&quot;sync/atomic&quot;</summary><a href="#line-4"<span class="line-link">Permanant link</span></a><a href="#line-4"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-5"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-5"<span class="line-number">5</span></a></span><span style="color:#323232;">)</summary><a href="#line-5"<span class="line-link">Permanant link</span></a><a href="#line-5"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-6"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-6"<span class="line-number">6</span></a></span><span style="color:#323232;"></summary><a href="#line-6"<span class="line-link">Permanant link</span></a><a href="#line-6"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-7"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-7"<span class="line-number">7</span></a></span><span style="font-weight:bold;color:#a71d5d;">var </span><span style="color:#323232;">(</summary><a href="#line-7"<span class="line-link">Permanant link</span></a><a href="#line-7"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-8"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-8"<span class="line-number">8</span></a></span><span style="color:#323232;">	atomicLock </span><span style="font-weight:bold;color:#a71d5d;">= int32</span><span style="color:#323232;">(</span><span style="color:#0086b3;">0</span><span style="color:#323232;">)</summary><a href="#line-8"<span class="line-link">Permanant link</span></a><a href="#line-8"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-9"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-9"<span class="line-number">9</span></a></span><span style="color:#323232;">	locked </span><span style="font-weight:bold;color:#a71d5d;">= int32</span><span style="color:#323232;">(</span><span style="color:#0086b3;">1</span><span style="color:#323232;">)</summary><a href="#line-9"<span class="line-link">Permanant link</span></a><a href="#line-9"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-10"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-10"<span class="line-number">10</span></a></span><span style="color:#323232;">	unlocked </span><span style="font-weight:bold;color:#a71d5d;">= int32</span><span style="color:#323232;">(</span><span style="color:#0086b3;">0</span><span style="color:#323232;">)</summary><a href="#line-10"<span class="line-link">Permanant link</span></a><a href="#line-10"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-11"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-11"<span class="line-number">11</span></a></span><span style="color:#323232;">)</summary><a href="#line-11"<span class="line-link">Permanant link</span></a><a href="#line-11"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-12"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-12"<span class="line-number">12</span></a></span><span style="color:#323232;"></summary><a href="#line-12"<span class="line-link">Permanant link</span></a><a href="#line-12"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-13"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-13"<span class="line-number">13</span></a></span><span style="font-style:italic;color:#969896;">// lock spins in the loop until it can &quot;acquire&quot; the lock</summary><a href="#line-13"<span class="line-link">Permanant link</span></a><a href="#line-13"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-14"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-14"<span class="line-number">14</span></a></span><span style="font-style:italic;color:#969896;">// by atomically changing the atomicLock variable from </summary><a href="#line-14"<span class="line-link">Permanant link</span></a><a href="#line-14"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-15"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-15"<span class="line-number">15</span></a></span><span style="font-style:italic;color:#969896;">// unlocked to locked. Our CPU will guarantee that </summary><a href="#line-15"<span class="line-link">Permanant link</span></a><a href="#line-15"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-16"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-16"<span class="line-number">16</span></a></span><span style="font-style:italic;color:#969896;">// only one thread/goroutine will succeed if multiple</summary><a href="#line-16"<span class="line-link">Permanant link</span></a><a href="#line-16"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-17"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-17"<span class="line-number">17</span></a></span><span style="font-style:italic;color:#969896;">// try to lock at the same time, and the others will</summary><a href="#line-17"<span class="line-link">Permanant link</span></a><a href="#line-17"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-18"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-18"<span class="line-number">18</span></a></span><span style="font-style:italic;color:#969896;">// block in the for loop until atomicLock is set to</summary><a href="#line-18"<span class="line-link">Permanant link</span></a><a href="#line-18"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-19"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-19"<span class="line-number">19</span></a></span><span style="font-style:italic;color:#969896;">// unlocked.</summary><a href="#line-19"<span class="line-link">Permanant link</span></a><a href="#line-19"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-20"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-20"<span class="line-number">20</span></a></span><span style="font-weight:bold;color:#a71d5d;">func </span><span style="font-weight:bold;color:#795da3;">lock</span><span style="color:#323232;">() {</summary><a href="#line-20"<span class="line-link">Permanant link</span></a><a href="#line-20"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-21"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-21"<span class="line-number">21</span></a></span><span style="color:#323232;">	pointer </span><span style="font-weight:bold;color:#a71d5d;">:= &amp;</span><span style="color:#323232;">atomicLock</summary><a href="#line-21"<span class="line-link">Permanant link</span></a><a href="#line-21"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-22"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-22"<span class="line-number">22</span></a></span><span style="color:#323232;">	old </span><span style="font-weight:bold;color:#a71d5d;">:=</span><span style="color:#323232;"> unlocked</summary><a href="#line-22"<span class="line-link">Permanant link</span></a><a href="#line-22"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-23"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-23"<span class="line-number">23</span></a></span><span style="color:#323232;">	new </span><span style="font-weight:bold;color:#a71d5d;">:=</span><span style="color:#323232;"> locked</summary><a href="#line-23"<span class="line-link">Permanant link</span></a><a href="#line-23"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-24"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-24"<span class="line-number">24</span></a></span><span style="color:#323232;">	</span><span style="font-weight:bold;color:#a71d5d;">for </span><span style="color:#323232;">{</summary><a href="#line-24"<span class="line-link">Permanant link</span></a><a href="#line-24"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-25"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-25"<span class="line-number">25</span></a></span><span style="color:#323232;">		</span><span style="font-style:italic;color:#969896;">// spin until we successfully change the</summary><a href="#line-25"<span class="line-link">Permanant link</span></a><a href="#line-25"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-26"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-26"<span class="line-number">26</span></a></span><span style="color:#323232;">		</span><span style="font-style:italic;color:#969896;">// atomicLock from unlocked to locked</summary><a href="#line-26"<span class="line-link">Permanant link</span></a><a href="#line-26"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-27"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-27"<span class="line-number">27</span></a></span><span style="color:#323232;">		</span><span style="font-weight:bold;color:#a71d5d;">if</span><span style="color:#323232;"> atomic.CompareAndSwapInt32(pointer, old, </span><span style="color:#62a35c;">new</span><span style="color:#323232;">) {</summary><a href="#line-27"<span class="line-link">Permanant link</span></a><a href="#line-27"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-28"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-28"<span class="line-number">28</span></a></span><span style="color:#323232;">			</span><span style="font-weight:bold;color:#a71d5d;">return</summary><a href="#line-28"<span class="line-link">Permanant link</span></a><a href="#line-28"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-29"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-29"<span class="line-number">29</span></a></span><span style="color:#323232;">		}</summary><a href="#line-29"<span class="line-link">Permanant link</span></a><a href="#line-29"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-30"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-30"<span class="line-number">30</span></a></span><span style="color:#323232;">	} </summary><a href="#line-30"<span class="line-link">Permanant link</span></a><a href="#line-30"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-31"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-31"<span class="line-number">31</span></a></span><span style="color:#323232;">}</summary><a href="#line-31"<span class="line-link">Permanant link</span></a><a href="#line-31"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-32"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-32"<span class="line-number">32</span></a></span><span style="color:#323232;"></summary><a href="#line-32"<span class="line-link">Permanant link</span></a><a href="#line-32"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-33"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-33"<span class="line-number">33</span></a></span><span style="font-weight:bold;color:#a71d5d;">func </span><span style="font-weight:bold;color:#795da3;">unlock</span><span style="color:#323232;">() {</summary><a href="#line-33"<span class="line-link">Permanant link</span></a><a href="#line-33"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-34"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-34"<span class="line-number">34</span></a></span><span style="color:#323232;">	atomic.StoreInt32(</span><span style="font-weight:bold;color:#a71d5d;">&amp;</span><span style="color:#323232;">atomicLock, unlocked)</summary><a href="#line-34"<span class="line-link">Permanant link</span></a><a href="#line-34"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-35"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-35"<span class="line-number">35</span></a></span><span style="color:#323232;">}</summary><a href="#line-35"<span class="line-link">Permanant link</span></a><a href="#line-35"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-36"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-36"<span class="line-number">36</span></a></span><span style="color:#323232;"></summary><a href="#line-36"<span class="line-link">Permanant link</span></a><a href="#line-36"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-37"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-37"<span class="line-number">37</span></a></span><span style="font-weight:bold;color:#a71d5d;">func </span><span style="font-weight:bold;color:#795da3;">main</span><span style="color:#323232;">() {</summary><a href="#line-37"<span class="line-link">Permanant link</span></a><a href="#line-37"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-38"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-38"<span class="line-number">38</span></a></span><span style="color:#323232;">	lock()</summary><a href="#line-38"<span class="line-link">Permanant link</span></a><a href="#line-38"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-39"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-39"<span class="line-number">39</span></a></span><span style="color:#323232;">	</span><span style="font-weight:bold;color:#a71d5d;">defer </span><span style="color:#323232;">unlock()</summary><a href="#line-39"<span class="line-link">Permanant link</span></a><a href="#line-39"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-40"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-40"<span class="line-number">40</span></a></span><span style="color:#323232;">	</span><span style="font-style:italic;color:#969896;">// do some exclusive shit	</summary><a href="#line-40"<span class="line-link">Permanant link</span></a><a href="#line-40"<span class="line-link">Highlight</span></a></details></div></span><span style="color:#323232;">}</span></pre></div>
+                     <a class="gist_link" href="https://gist.github.com/3ea39ab38ce10518acb4ec9c75f61a6e" target="_blank">See gist on GitHub</a></div>
+
+<p>Even though a spinlock is burning power in a tight loop until it succeeds, it actually is sometimes preferred over a traditional mutex. Traditional mutexes put a thread to sleep when they block, increasing the minimum latency for acquiring them from another thread. Modern mutexes are often <a rel="noreferrer" href="http://man7.org/linux/man-pages/man7/futex.7.html">a hybrid approach</a> between a spinlock and a traditional mutex. Hybrid mutexes will attempt to acquire the lock quickly in userspace using atomic operations, without giving away their kernel-scheduled appointment on the CPU core. If the gambit didn’t pan out, the hybrid mutex will put the thread to sleep with a blocking syscall.</p>
+
+<p>Many real-world implementations of spinlocks for x86 <a rel="noreferrer" href="https://geidav.wordpress.com/2016/03/23/test-and-set-spinlocks/">will issue a <code>PAUSE</code> instruction while spinnin</a>g, which improves their efficiency dramatically. In addition to spinlocks avoiding the kernel scheduling overhead of going to sleep and waking up again, we also avoid CPU frequency scaling slowdowns that can happen while blocked on a mutex, so when we enter our critical section we don’t need to pay a start-up tax.</p>
+
+<p>There are still some cases when you would prefer a straight-up spinlock, like if you know the expected time to acquire the lock is less expensive to you than the overhead of a modern hybrid mutex, or if you want a piece of code to be extremely responsive at the cost of some other system resource like power. But as the expected time to acquire the lock goes up, the balance shifts in favor of the mutex (mutexes in most popular threaded languages use the hybrid approach today).</p>
+
+<h4>A Treiber Stack</h4>
+
+<p>A Treiber stack will be our first true lock-free structure! It looks a lot like a linked list, with a head that points to the tip and nodes that point to the next node. We can push things into a lock-free stack like this:</p>
+
+<ol><li>Create a node (effectively the same as a linked-list node)</li>
+
+<li>Read the current <code>stack.head</code> and set our <code>node.next</code> to it.</li>
+
+<li>CAS the stack’s head from the head to our new node. If it worked, we’re done! If not, GOTO 2.</li>
+
+</ol><p>Popping the stack is similar:</p>
+
+<ol><li>Read the current <code>stack.head</code>. If it’s not set, either retry or return nothing depending on if you have blocking or non-blocking semantics. The example below is non-blocking, and returns nothing.</li>
+
+<li>If head is set, we try to pop it. Try to CAS the stack’s <code>head</code>to its <code>head.next</code>value. If it worked, return the now-severed head! Otherwise GOTO 1.</li>
+
+</ol><div class="gist_container"><div class="code-block gist-block"><style>
+        .gist_file {
+            background-color:#ffffff;
+        }</style><pre style="background-color:#ffffff;"><div title='click for more options' id="line-1"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-1"<span class="line-number">1</span></a><span style="font-weight:bold;color:#a71d5d;">import </span><span style="color:#0086b3;">java.util.concurrent.atomic</span><span style="color:#323232;">.*;</summary><a href="#line-1"<span class="line-link">Permanant link</span></a><a href="#line-1"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-2"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-2"<span class="line-number">2</span></a></span><span style="color:#323232;"></summary><a href="#line-2"<span class="line-link">Permanant link</span></a><a href="#line-2"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-3"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-3"<span class="line-number">3</span></a></span><span style="font-weight:bold;color:#a71d5d;">import </span><span style="color:#0086b3;">net.jcip.annotations</span><span style="color:#323232;">.*;</summary><a href="#line-3"<span class="line-link">Permanant link</span></a><a href="#line-3"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-4"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-4"<span class="line-number">4</span></a></span><span style="color:#323232;"></summary><a href="#line-4"<span class="line-link">Permanant link</span></a><a href="#line-4"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-5"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-5"<span class="line-number">5</span></a></span><span style="font-style:italic;color:#969896;">/**</summary><a href="#line-5"<span class="line-link">Permanant link</span></a><a href="#line-5"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-6"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-6"<span class="line-number">6</span></a></span><span style="font-style:italic;color:#969896;"> * ConcurrentStack</summary><a href="#line-6"<span class="line-link">Permanant link</span></a><a href="#line-6"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-7"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-7"<span class="line-number">7</span></a></span><span style="font-style:italic;color:#969896;"> *</summary><a href="#line-7"<span class="line-link">Permanant link</span></a><a href="#line-7"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-8"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-8"<span class="line-number">8</span></a></span><span style="font-style:italic;color:#969896;"> * retrieved from https://en.wikipedia.org/wiki/Treiber_Stack</summary><a href="#line-8"<span class="line-link">Permanant link</span></a><a href="#line-8"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-9"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-9"<span class="line-number">9</span></a></span><span style="font-style:italic;color:#969896;"> *</summary><a href="#line-9"<span class="line-link">Permanant link</span></a><a href="#line-9"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-10"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-10"<span class="line-number">10</span></a></span><span style="font-style:italic;color:#969896;"> * Nonblocking stack using Treiber&#39;s algorithm</summary><a href="#line-10"<span class="line-link">Permanant link</span></a><a href="#line-10"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-11"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-11"<span class="line-number">11</span></a></span><span style="font-style:italic;color:#969896;"> *</summary><a href="#line-11"<span class="line-link">Permanant link</span></a><a href="#line-11"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-12"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-12"<span class="line-number">12</span></a></span><span style="font-style:italic;color:#969896;"> * </span><span style="font-weight:bold;color:#a71d5d;">@author</span><span style="font-style:italic;color:#969896;"> Brian Goetz and Tim Peierls</summary><a href="#line-12"<span class="line-link">Permanant link</span></a><a href="#line-12"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-13"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-13"<span class="line-number">13</span></a></span><span style="font-style:italic;color:#969896;"> */</summary><a href="#line-13"<span class="line-link">Permanant link</span></a><a href="#line-13"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-14"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-14"<span class="line-number">14</span></a></span><span style="color:#323232;">@ThreadSafe</summary><a href="#line-14"<span class="line-link">Permanant link</span></a><a href="#line-14"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-15"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-15"<span class="line-number">15</span></a></span><span style="font-weight:bold;color:#a71d5d;">public class </span><span style="color:#0086b3;">ConcurrentStack </span><span style="color:#323232;">&lt;E&gt; {</summary><a href="#line-15"<span class="line-link">Permanant link</span></a><a href="#line-15"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-16"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-16"<span class="line-number">16</span></a></span><span style="color:#323232;">    </span><span style="color:#0086b3;">AtomicReference</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt;&gt; top </span><span style="font-weight:bold;color:#a71d5d;">= new </span><span style="color:#0086b3;">AtomicReference</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt;&gt;();</summary><a href="#line-16"<span class="line-link">Permanant link</span></a><a href="#line-16"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-17"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-17"<span class="line-number">17</span></a></span><span style="color:#323232;"></summary><a href="#line-17"<span class="line-link">Permanant link</span></a><a href="#line-17"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-18"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-18"<span class="line-number">18</span></a></span><span style="color:#323232;">    </span><span style="font-weight:bold;color:#a71d5d;">public void </span><span style="font-weight:bold;color:#795da3;">push</span><span style="color:#323232;">(</span><span style="color:#0086b3;">E </span><span style="color:#323232;">item) {</summary><a href="#line-18"<span class="line-link">Permanant link</span></a><a href="#line-18"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-19"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-19"<span class="line-number">19</span></a></span><span style="color:#323232;">        </span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt; newHead </span><span style="font-weight:bold;color:#a71d5d;">= new </span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt;(item);</summary><a href="#line-19"<span class="line-link">Permanant link</span></a><a href="#line-19"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-20"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-20"<span class="line-number">20</span></a></span><span style="color:#323232;">        </span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt; oldHead;</summary><a href="#line-20"<span class="line-link">Permanant link</span></a><a href="#line-20"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-21"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-21"<span class="line-number">21</span></a></span><span style="color:#323232;">        </span><span style="font-weight:bold;color:#a71d5d;">do </span><span style="color:#323232;">{</summary><a href="#line-21"<span class="line-link">Permanant link</span></a><a href="#line-21"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-22"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-22"<span class="line-number">22</span></a></span><span style="color:#323232;">            oldHead </span><span style="font-weight:bold;color:#a71d5d;">=</span><span style="color:#323232;"> top.get();</summary><a href="#line-22"<span class="line-link">Permanant link</span></a><a href="#line-22"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-23"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-23"<span class="line-number">23</span></a></span><span style="color:#323232;">            newHead.next </span><span style="font-weight:bold;color:#a71d5d;">=</span><span style="color:#323232;"> oldHead;</summary><a href="#line-23"<span class="line-link">Permanant link</span></a><a href="#line-23"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-24"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-24"<span class="line-number">24</span></a></span><span style="color:#323232;">        } </span><span style="font-weight:bold;color:#a71d5d;">while </span><span style="color:#323232;">(</span><span style="font-weight:bold;color:#a71d5d;">!</span><span style="color:#323232;">top.compareAndSet(oldHead, newHead));</summary><a href="#line-24"<span class="line-link">Permanant link</span></a><a href="#line-24"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-25"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-25"<span class="line-number">25</span></a></span><span style="color:#323232;">    }</summary><a href="#line-25"<span class="line-link">Permanant link</span></a><a href="#line-25"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-26"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-26"<span class="line-number">26</span></a></span><span style="color:#323232;"></summary><a href="#line-26"<span class="line-link">Permanant link</span></a><a href="#line-26"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-27"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-27"<span class="line-number">27</span></a></span><span style="color:#323232;">    </span><span style="font-weight:bold;color:#a71d5d;">public </span><span style="color:#0086b3;">E </span><span style="font-weight:bold;color:#795da3;">pop</span><span style="color:#323232;">() {</summary><a href="#line-27"<span class="line-link">Permanant link</span></a><a href="#line-27"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-28"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-28"<span class="line-number">28</span></a></span><span style="color:#323232;">        </span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt; oldHead;</summary><a href="#line-28"<span class="line-link">Permanant link</span></a><a href="#line-28"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-29"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-29"<span class="line-number">29</span></a></span><span style="color:#323232;">        </span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt; newHead;</summary><a href="#line-29"<span class="line-link">Permanant link</span></a><a href="#line-29"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-30"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-30"<span class="line-number">30</span></a></span><span style="color:#323232;">        </span><span style="font-weight:bold;color:#a71d5d;">do </span><span style="color:#323232;">{</summary><a href="#line-30"<span class="line-link">Permanant link</span></a><a href="#line-30"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-31"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-31"<span class="line-number">31</span></a></span><span style="color:#323232;">            oldHead </span><span style="font-weight:bold;color:#a71d5d;">=</span><span style="color:#323232;"> top.get();</summary><a href="#line-31"<span class="line-link">Permanant link</span></a><a href="#line-31"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-32"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-32"<span class="line-number">32</span></a></span><span style="color:#323232;">            </span><span style="font-weight:bold;color:#a71d5d;">if </span><span style="color:#323232;">(oldHead </span><span style="font-weight:bold;color:#a71d5d;">== </span><span style="color:#0086b3;">null</span><span style="color:#323232;">)</summary><a href="#line-32"<span class="line-link">Permanant link</span></a><a href="#line-32"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-33"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-33"<span class="line-number">33</span></a></span><span style="color:#323232;">                </span><span style="font-weight:bold;color:#a71d5d;">return </span><span style="color:#0086b3;">null</span><span style="color:#323232;">;</summary><a href="#line-33"<span class="line-link">Permanant link</span></a><a href="#line-33"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-34"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-34"<span class="line-number">34</span></a></span><span style="color:#323232;">            newHead </span><span style="font-weight:bold;color:#a71d5d;">=</span><span style="color:#323232;"> oldHead.next;</summary><a href="#line-34"<span class="line-link">Permanant link</span></a><a href="#line-34"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-35"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-35"<span class="line-number">35</span></a></span><span style="color:#323232;">        } </span><span style="font-weight:bold;color:#a71d5d;">while </span><span style="color:#323232;">(</span><span style="font-weight:bold;color:#a71d5d;">!</span><span style="color:#323232;">top.compareAndSet(oldHead, newHead));</summary><a href="#line-35"<span class="line-link">Permanant link</span></a><a href="#line-35"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-36"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-36"<span class="line-number">36</span></a></span><span style="color:#323232;">        </span><span style="font-weight:bold;color:#a71d5d;">return</span><span style="color:#323232;"> oldHead.item;</summary><a href="#line-36"<span class="line-link">Permanant link</span></a><a href="#line-36"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-37"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-37"<span class="line-number">37</span></a></span><span style="color:#323232;">    }</summary><a href="#line-37"<span class="line-link">Permanant link</span></a><a href="#line-37"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-38"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-38"<span class="line-number">38</span></a></span><span style="color:#323232;"></summary><a href="#line-38"<span class="line-link">Permanant link</span></a><a href="#line-38"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-39"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-39"<span class="line-number">39</span></a></span><span style="color:#323232;">    </span><span style="font-weight:bold;color:#a71d5d;">private static class </span><span style="color:#0086b3;">Node </span><span style="color:#323232;">&lt;E&gt; {</summary><a href="#line-39"<span class="line-link">Permanant link</span></a><a href="#line-39"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-40"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-40"<span class="line-number">40</span></a></span><span style="color:#323232;">        </span><span style="font-weight:bold;color:#a71d5d;">public final </span><span style="color:#0086b3;">E</span><span style="color:#323232;"> item;</summary><a href="#line-40"<span class="line-link">Permanant link</span></a><a href="#line-40"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-41"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-41"<span class="line-number">41</span></a></span><span style="color:#323232;">        </span><span style="font-weight:bold;color:#a71d5d;">public </span><span style="color:#0086b3;">Node</span><span style="color:#323232;">&lt;</span><span style="color:#0086b3;">E</span><span style="color:#323232;">&gt; next;</summary><a href="#line-41"<span class="line-link">Permanant link</span></a><a href="#line-41"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-42"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-42"<span class="line-number">42</span></a></span><span style="color:#323232;"></summary><a href="#line-42"<span class="line-link">Permanant link</span></a><a href="#line-42"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-43"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-43"<span class="line-number">43</span></a></span><span style="color:#323232;">        </span><span style="font-weight:bold;color:#a71d5d;">public </span><span style="font-weight:bold;color:#795da3;">Node</span><span style="color:#323232;">(</span><span style="color:#0086b3;">E </span><span style="color:#323232;">item) {</summary><a href="#line-43"<span class="line-link">Permanant link</span></a><a href="#line-43"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-44"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-44"<span class="line-number">44</span></a></span><span style="color:#323232;">            this.item </span><span style="font-weight:bold;color:#a71d5d;">=</span><span style="color:#323232;"> item;</summary><a href="#line-44"<span class="line-link">Permanant link</span></a><a href="#line-44"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-45"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-45"<span class="line-number">45</span></a></span><span style="color:#323232;">        }</summary><a href="#line-45"<span class="line-link">Permanant link</span></a><a href="#line-45"<span class="line-link">Highlight</span></a></details></div><div title='click for more options' id="line-46"class="line"><details class='line_links'><summary class='line_top-link'><a href="#line-46"<span class="line-number">46</span></a></span><span style="color:#323232;">    }</summary><a href="#line-46"<span class="line-link">Permanant link</span></a><a href="#line-46"<span class="line-link">Highlight</span></a></details></div></span><span style="color:#323232;">}</span></pre></div>
+                     <a class="gist_link" href="https://gist.github.com/b628edb1bb2d67921c936fa8c25983b3" target="_blank">See gist on GitHub</a></div>
+
+<h4>Spin Spin Spin</h4>
+
+<p>If another thread either pushed or popped a node after we read the head value but before we performed our CAS, then our CAS will fail because the current value is no longer what we read before. We’ve been had! But we can just spin until we succeed or crash from the bug we accidentally wrote.</p>
+
+<figure><img width="2000" src="/asset/medium/1*LY2ohYsNa9nOV1Clko3zJA.png" /> <figcaption>Similar to an aircraft holding pattern before landing, lock-free algorithms can spin in a loop until they are able to complete.</figcaption></figure>
+
+<p>This is a common theme in lock-free algorithms: spin until successful. This means that if a system has high contention (threads competing for the same resource), or spends lots of time doing things that look like spinlocks, a lock-free algorithm could be far less efficient with CPU resources than a mutex that puts blocked threads to sleep. If lots of threads are looping and throwing away work that they do, another approach may work better.</p>
+
+<p>Maybe this is a good place to stop. Let’s give up and return to our cozy mutex-protected hometown, more experienced, and appreciative of its simple beauty.</p>
+
+<h4>No More Waiting</h4>
+
+<p>But our life has only recently taken a turn for the worst, and it would be a shame not to see this one through to rock bottom. <strong>Wait-free algorithms</strong>, a subset of lock-free algorithms, guarantee <em>bounded time execution</em>. If your algorithm involves atomic variables and a bounded number of steps, you‘ve got a wait-free algorithm on your hands!</p>
+
+<p>A simple one is incrementing and decrementing an <a rel="noreferrer" href="http://www.1024cores.net/home/lock-free-algorithms/introduction">atomic reference counter</a>. This is what Python, Swift, and sometimes Rust use for keeping track of objects shared by multiple threads that need to be destroyed exactly once when all threads are done. This is a simple form of garbage collection!</p>
+
+<p>The use of a constant number of instructions (1 in the case of incrementing or decrementing an atomic reference counter) is actually an example of a particularly strong type of wait-freedom known as “wait-free population oblivious” where the number of steps we take in our code is not dependent on the number of threads participating. Other wait-free algorithms sometimes work by trying to complete the work of a bounded number of other threads, and that bound could grow or shrink as the number of participating threads changes.</p>
+
+<h4>The Value of Reliable Latency</h4>
+
+<p>More complex wait-free algorithms are often a bit slower than lock-free counterparts when there’s no contention, but under high load they can weather the storm with predictable latency, making them an ideal choice for use in real-time systems.</p>
+
+<p>Reliable latency is particularly important for building high-performance systems, even when it means higher average latency. If there is a rare, super slow event, it can cause backpressure to whiplash through large swaths of the system and in practice you’ll get blasts of failures, like connection errors as the TCP backlog quickly fills up. People who have managed redis at high scales are often too familiar with the devastating effects of a single very slow command on their overall system’s reliability, because it stops all other commands from being handled until the slow one is complete. With concurrent algorithms, it’s often a similar story.</p>
+
+<p>In the last few years, folks have found a nice balance between usually-fast lock-free and reliable wait-free algorithms by <a rel="noreferrer" href="http://www.cs.technion.ac.il/~erez/Papers/wf-methodology-ppopp12.pdf">attempting the lock-free version at first, and falling back to the wait-free version if it doesn’t pan out</a>. This reminds me of the compromise found in modern hybrid mutexes to improve the flexibility of the implementation.</p>
+
+<h4>Lock-Free Transactions on Multiple Items in a Tree</h4>
+
+<p>A technique sometimes used in databases and filesystems is <a rel="noreferrer" href="https://en.wikipedia.org/wiki/Shadow_paging"><strong>shadow paging</a></strong>. Sometimes we want to atomically update multiple items stored in a tree structure. The basic idea is:</p>
+
+<ol><li>read the pointer to the root</li>
+
+<li>copy the things we want to change into new tree nodes, then go up the tree creating new (copied) nodes that reference the previous copied and changed level, going up the tree until we reach the root. All of this is done without changing the original tree.</li>
+
+<li>Finally, we CAS the root to point to our changed pages.</li>
+
+<li>if the CAS worked, our multi-item transaction was successful. if not, we either retry or propagate an error to the next higher level of our system.</li>
+
+</ol><p>This copy-on-write technique is quite useful in some lock-free systems, but it can involve excessive copying. It’s fairly rare that this technique is a better choice than using fine-grained <a rel="noreferrer" href="https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock">reader-writer locks</a> on multiple items in a tree. Still, a good trick to have in our spellbook for transactions on a small number of shared items.</p>
+
+<p>There are a <a rel="noreferrer" href="https://github.com/awslabs/dynamodb-transactions/blob/master/DESIGN.md">number</a> of interesting lock-free transaction techniques that work on <a rel="noreferrer" href="https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36726.pdf">larger datasets</a>, but they are a little more complicated. If you’re curious I suggest starting with <a rel="noreferrer" href="http://rystsov.info/2012/09/01/cas.html">this one</a>. Note that these are actually algorithms from the distributed systems world, which is similar to lock-free in many ways, differing mostly in terms of latency and reliability. If it works in a distributed system, it will work on a single system, but may totally be overkill.</p>
+
+<h3>Common Problems in Lock-Free Programs</h3>
+
+<h4>The ABA Problem</h4>
+
+<p><code>5 == 5 — 1 + 1</code></p>
+
+<p>One may assume “if our CAS succeeded, nothing has happened since we read the old value”. This is only true for <a rel="noreferrer" href="https://en.wikipedia.org/wiki/Monotonic_function"><strong>monotonic</a></strong> values like a counter that you only increment. But if you can increment AND decrement the counter, all hell breaks loose. If a non-monotonic value was 17 one minute ago and it’s 17 now, there may have been a bunch of random increments and decrements in the interlude. Or maybe a single operation that caused the value to wrap.</p>
+
+<p>If you’re using a 64 bit counter, and you’re incrementing it once every second for every human on earth, in less than 100 years your counter will reach the maximum 64 bit number and wrap back to 0 when the next addition occurs. If you’re using a 32 bit number, you have less than one second of sanity. Don’t spend it all in one place!</p>
+
+<p>This is problematic to the extent that we <em>conflate equality with a lack of change</em>. In the next section I’ll show you a gnarly scar I got from making this mistake.</p>
+
+<h4>ABA and Pointers</h4>
+
+<p>Very often, we use CAS operations on pointers. If we can rely on a strong GC system, we don’t need to worry about dangling pointers, and it can be simpler to build more complicated lock-free structures in Java or Go compared to C++ or Rust because of this.</p>
+
+<p>Pointers are not monotonic!!! Our memory allocators often will put a new memory family in the same memory house when the old one moves away to memory heaven (or memory hell if they were bad and spent their lives writing lock-free algorithms).</p>
+
+<p>This really happened to me:</p>
+
+<ol><li>I put a 48 byte structure into a lock-free stack that represented the history of a shared piece of state</li>
+
+<li>A thread <strong>read</strong> the <code>stack.head</code> for the “history stack”</li>
+
+<li>I deleted the structure and set the history stack’s <code>stack.head</code> to null. I <strong>freed</strong> all of the objects that were in history, including the object from step #1</li>
+
+<li>I created a <strong>new history</strong> stack for the object, and allocated a new 48 byte structure. The memory allocator chose the same offset as the original object in step #1, because it was a good fit.</li>
+
+<li>the thread from #2 looked at the old history stack and decided it should attempt to augment that history</li>
+
+<li>the thread from #2 created a new update whose correctness was dependent on the history being unchanged</li>
+
+<li>the thread from #2 did a CAS operation on the new stack, which represented significant changes. <strong>The CAS worked </strong>because the address was the same as when the read occurred in step #2. My tests did not catch this bug.</li>
+
+<li>I went to <strong>memory hell</strong> for a long time until I understood the nature of my memory sins. It was messed up.</li>
+
+</ol><p>This was actually two bugs: ABA and a dangling pointer that was left referring to invalid state. I assumed my CAS protected me from caring about it as long as I never dereferenced it, but I was dead wrong. If you’re curious, I was trying to <a rel="noreferrer" href="https://github.com/spacejam/sled">implement</a> a similar system to the one shown on <a rel="noreferrer" href="http://cs.brown.edu/courses/cs227/archives/2015/slides/week2/2-sam-BWTree.pdf">slide 11</a> from this presentation on Bw-Trees.</p>
+
+<h3>Common Safeguards</h3>
+
+<h4>Mitigating ABA</h4>
+
+<p>There are a number of techniques for avoiding ABA!</p>
+
+<ol><li>Don’t write lock-free algorithms. It’s really a no-brainer. Don’t do it.</li>
+
+<li>Add some extra stuff to the data that we put in atomic variables. Use 16-bits to store a quasi-monotonic counter that you bump by 1 each time you modify the shared state. How many bits of state do you really need? 64-bit linux actually uses 48 bits for addresses (256 TB of address space, but this is reconfigurable if you are <strong>baller AF</strong>), so you have 16 bits free with pointers anyway. If a structure takes up 2⁵ bytes each, and it’s allocated at aligned addresses, then you have 5 bits of free state in the “low-bits” to use for even more tag data. Just don’t forget to zero those bits out before you dereference the actual pointer!</li>
+
+</ol><h4>Mitigating Dangling Pointers and Use After Free</h4>
+
+<p>In addition to ABA, we have new challenges in managing our memory, now that multiple threads may be reading and mutating our shared state concurrently.</p>
+
+<p>When we remove an item from a lock-free stack, for example, there may be threads that read the node just before we detached it! Those threads may still be operating on the now-unreachable state. So after we remove the node from the stack, we must wait until we know that all threads are done reading it before using the memory for something else.</p>
+
+<p>This is a tricky problem, but luckily there are some good ways to reduce the bleeding.</p>
+
+<ol><li>Use a language with GC. This eliminates these bugs by design. Plenty of good choices out there. <a rel="noreferrer" href="http://www.elise.com/quotes/heinlein_-_specialization_is_for_insects">Specialization is for insects</a>! Go learn Java, you C++ hipsters! Rust’s guaranteed object destruction without GC doesn’t cover your ass in the lock-free world (but check out the first links in #2 or #3 for nice solutions).</li>
+
+<li><a rel="noreferrer" href="https://aturon.github.io/blog/2015/08/27/epoch/">Epoch Reclamation</a> has threads check-in to an “epoch” before they access shared state. When they stop working on shared state, they check-out of that epoch. When state is made unreachable, and you want to delete it, you have to wait until any thread that COULD have seen it has moved on. For each object we want to free, we add it to the <em>current</em> epoch’s garbage bag (this could be a later epoch than the one we initially checked into). Only after all threads have checked out of epochs before or equal to the one for a particular garbage bag can we actually free the data. This is how I fixed the bug I hit in the <a rel="noreferrer" href="#0d6d">ABA and Pointers</a> section. This is used extensively in the <a rel="noreferrer" href="https://lwn.net/Articles/262464/">linux kernel’s RCU system</a>.</li>
+
+<li><a rel="noreferrer" href="http://ticki.github.io/blog/fearless-concurrency-with-hazard-pointers/">Hazard Pointers</a> are similar to epoch reclamation but they operate on a more fine-grained level. This can be good for keeping latency per reclamation lower, but it will drop the throughput of the system.</li>
+
+</ol><h3>Making a Lock-Free System For Real</h3>
+
+<p>So, you want to use this stuff in production. The reliability consultant in me delights. Go forth. Build a bonfire. But seriously, this takes a real investment. Like distributed algorithms, there are tons of subtleties here that are easy to miss, even by experts. Here is a responsible path to take if you choose to do so:</p>
+
+<ol><li>Use a popular, well-tested existing library for as much as possible. Ideally one known to be running at very high scales at one of the infrastructure / financial giants in correctness-critical paths, not just some low-risk internal subsystem.</li>
+
+<li>If you must implement something on your own, scour the literature for known solutions. Opt for the ones that are a little older with high citation counts. New algorithms described in papers in this field are sometimes found to contain subtle bugs.</li>
+
+<li>Understand by modeling before implementing. Write an <a rel="noreferrer" href="http://iris-project.org/">Iris</a>, SPIN, TLA+, etc… model describing the algorithm to make sure you really understand what’s going on. You will usually save a lot of time by modeling it before jumping into implementation. Check out <a rel="noreferrer" href="https://www.learntla.com/introduction/example/">this guide</a> for getting started with TLA+! It’s weird and fun.</li>
+
+<li>Follow the <a rel="noreferrer" href="http://wiki.c2.com/?CleanroomSoftwareEngineering">cleanroom methodology</a> while implementing it.</li>
+
+<li>Find a way to deterministically and exhaustively evaluate all interesting thread interleavings of your implementation. Lots of bugs will jump out if you can do this! Just running a test workload for a few weeks on a small test cluster is not representative of what will happen on diverse hardware running diverse workloads and causing threads to be scheduled in diverse ways. This is the holy grail! Start your implementation from the beginning with this goal in mind, and build things into it that make testing in this way easier. (and stay tuned for a future post on this subject)</li>
+
+<li>Use the <a rel="noreferrer" href="https://github.com/google/sanitizers/wiki">LLVM sanitizers</a> extensively while exercising interleavings in the code, if your programming language supports them or similar tooling. They will slow down your program a little bit, but will detect all sorts of bugs that may not break your tests. They can find race conditions, memory leaks, use-after-free bugs, buffer overflows, all sorts of juicy stuff. When Hanno compiled a standard linux system to run the sanitizers on his entire system, <a rel="noreferrer" href="https://www.youtube.com/watch?v=npWY4hMTBhI">he found and fixed an astounding number of bugs</a> in several programs you may rely on every day.</li>
+
+<li>Remember that by learning about specific bug classes, <a rel="noreferrer" href="http://lesswrong.com/lw/he/knowing_about_biases_can_hurt_people/">you may actually become MORE vulnerable to falling victim to them</a>! We have a tendency to be overconfident about our ability to deal with problems we’ve learned about.</li>
+
+<li>Don’t write lock-free algorithms. You will die.</li>
+
+</ol><p>Thanks for reading! This is my first blog post, and I’d appreciate any feedback that would improve the experience for future articles! I’d like to give special thanks to those who defended readers against some of my egregious and irresponsible use of language, in (possibly buggy) alphabetical order: Alex Laties, Casey C, <a rel="noreferrer" href="https://twitter.com/daiyitastic">daiyi</a>, Gabe Conradi, Matthias Nehlsen, Peter Kolloch, Philipp Muens, Sargun Dhillon, Sassan F, and Steve Salevan, thank you so much!</p>
+
+</article>
+</main>
+</body>
+<style>
+* {
+margin: 0;
+padding: 0;
+}
+body {
+width: 100%;
+display: flex;
+flex-direction: column;
+}
+main {
+width: 35em;
+margin: auto;
+display: flex;
+flex-direction: column;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+font-family: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+a {
+color: rgb(0, 86, 179);
+text-decoration: none;
+}
+a:visited {
+color: rgb(0, 86, 179);
+}
+a:hover {
+text-decoration: underline;
+}
+html {
+color: #333;
+font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
+font-size: 26px;
+line-height: 1.55rem;
+}
+p {
+margin: 20px 0;
+}
+img {
+margin: auto;
+max-width: 100%;
+display: block;
+}
+figcaption {
+text-align: center;
+}
+/*
+code {
+font-family: monospace;
+font-size: 15px;
+white-space: pre-wrap;
+font-weight: 600;
+line-height: 1rem;
+padding: 5px;
+border-radius: 6px;
+background-color: rgba(175, 184, 193, 0.2);
+}
+*/
+pre {
+font-family: Menlo, Monaco, "Courier New", Courier, monospace;
+font-size: 15px;
+white-space: pre-wrap;
+/*
+font-weight: 600;
+*/
+line-height: 1rem;
+padding: 20px;
+border-radius: 6px;
+background-color: rgba(175, 184, 193, 0.2);
+}
+.code-block {
+display: block;
+margin: 5px 0;
+padding: 20px;
+}
+iframe {
+width: 100%;
+display: block;
+margin: auto;
+min-height: 100px;
+}
+@media screen and (max-width: 1200px) {
+html {
+font-size: 16px;
+line-height: 1.5rem;
+}
+main {
+width: 90%;
+}
+img {
+display: block;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+font-family: "Times New Roman", Times, serif;
+line-height: 30px;
+}
+}
+.author__photo {
+width: 28px;
+height: 28px;
+border-radius: 20px;
+display: inline-block;
+margin: auto;
+margin-right: 5px;
+display: inline-flex;
+}
+.medium__source {
+font-style: italic;
+}
+.author {
+display: inline-flex;
+flex-direction: row;
+margin-right: 5px;
+}
+.meta {
+display: inline-flex;
+}
+.gist_contianer {
+border-radius: 6px;
+border: 1px solid rgb(211, 211, 211);
+}
+.gist_link {
+margin-left: 5px;
+}
+.libmedium__meta {
+background-color: rgb(255, 165, 0);
+padding: 5px;
+}
+blockquote {
+margin-left: -5px;
+padding-left: 19px;
+border-left: 4px solid #333;
+font-style: italic;
+}
+ol,
+ul {
+margin-left: 40px;
+}
+.line-number {
+margin-right: 20px;
+display: inline-block;
+}
+.gist-block {
+overflow-x: scroll;
+display: block;
+}
+.mixtape {
+padding: 20px;
+border: 1px solid gray;
+display: flex;
+align-items: center;
+margin: 30px 0;
+}
+</style>
+</html>

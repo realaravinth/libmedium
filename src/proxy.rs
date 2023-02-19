@@ -281,6 +281,14 @@ mod tests {
             assert_eq!(resp.status(), StatusCode::FOUND);
             let headers = resp.headers();
             assert_eq!(headers.get(header::LOCATION).unwrap(), uri);
+
+            let url = "/@tylerneely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c";
+
+            let resp =
+                test::call_service(&app, test::TestRequest::get().uri(url).to_request()).await;
+            assert_eq!(resp.status(), StatusCode::OK);
+            let res = String::from_utf8(test::read_body(resp).await.to_vec()).unwrap();
+            assert!(res.contains(include_str!("../tests/7158b1cdd50c.html")));
         }
     }
 }
