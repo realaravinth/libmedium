@@ -1,0 +1,33 @@
+pipeline:
+  backend:
+    image: rust
+    environment:
+      - GIT_HASH=8e77345f1597e40c2e266cb4e6dee74888918a61 # dummy value
+      - COMPILED_DATE=2021-07-21
+    commands:
+      - rustup component add rustfmt
+      - rustup component add clippy
+      - make check
+      - make lint
+      - make
+      - make test
+
+  build_docker_img:
+    image: plugins/docker
+    when:
+      event: [pull_request]
+    settings:
+      dry_run: true
+      repo: realaravinth/libmedium
+      tags: latest
+
+  build_and_publish_docker_img:
+    image: plugins/docker
+    when:
+      event: [push, tag, deployment]
+    settings:
+      username: realaravinth
+      password:
+        from_secret: DOCKER_TOKEN
+      repo: realaravinth/libmedium
+      tags: latest
