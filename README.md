@@ -7,8 +7,7 @@
 </p>
 
 [![Awesome Humane Tech](https://raw.githubusercontent.com/humanetech-community/awesome-humane-tech/main/humane-tech-badge.svg?sanitize=true)](https://github.com/humanetech-community/awesome-humane-tech)
-[![Build](https://github.com/realaravinth/libmedium/actions/workflows/linux.yml/badge.svg)](https://github.com/realaravinth/libmedium/actions/workflows/linux.yml)
-[![dependency status](https://deps.rs/repo/github/realaravinth/libmedium/status.svg)](https://deps.rs/repo/github/realaravinth/libmedium)
+[![status-badge](https://ci.batsense.net/api/badges/realaravinth/libmedium/status.svg)](https://ci.batsense.net/realaravinth/libmedium)
 [![codecov](https://codecov.io/gh/realaravinth/libmedium/branch/master/graph/badge.svg)](https://codecov.io/gh/realaravinth/libmedium)
 
 </div>
