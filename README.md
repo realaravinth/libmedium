@@ -57,6 +57,7 @@ business.
 | http://md.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ | N/A | Hetzner | [~vern](https://vern.cc) |
 | http://vernaqj2qr2pijpgvf3od6ssc3ulz3nv52gwr3hba5l6humuzmgq.b32.i2p/ | N/A | Hetzner | [~vern](https://vern.cc)
 | https://medium.hostux.net | France   | Gandi   | [hostux](https://hostux.net) |
+| https://md.xbdm.fun       | Germany  | Hetzner | Hosted by [xbdm](https://www.xbdm.fun)
 
 
 
