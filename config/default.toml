@@ -3,13 +3,9 @@ source_code = "https://github.com/realaravinth/libmedium"
 #cache = "/var/lib/libmedium"
 
 [server]
-# The port at which you want authentication to listen to
-# takes a number, choose from 1000-10000 if you dont know what you are doing
 port = 7000
-#IP address. Enter 0.0.0.0 to listen on all availale addresses
-ip= "127.0.0.1" 
-# enter your hostname, eg: example.com
+ip = "0.0.0.0" 
 domain = "change-to-your-domain"
-allow_registration = true
+allow_registration = false
 proxy_has_tls = true
-workers = 4 #limt how many request it can handle
+workers = 4
