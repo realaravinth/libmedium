@@ -59,9 +59,7 @@ business.
 | https://medium.hostux.net | France   | Gandi   | [hostux](https://hostux.net) |
 | https://md.xbdm.fun       | Germany  | Hetzner | Hosted by [xbdm](https://www.xbdm.fun)
 
-
-
-## Deploy
+## Deploy with Docker
 
 1. Grab [`./config/default.toml`](./config/default.toml) and make
    necessary changes
@@ -84,6 +82,21 @@ above command.
 make docker
 ```
 
+## Deploy with Docker-Compose
+
+1. apt install git
+
+2. git clone https://github.com/realaravinth/libmedium.git medium
+
+3. nano ```config/default.toml```
+
+4. nano ```docker-compose.yml```
+
+5. docker-compose up -d
+
+```
+Go to your website: http://localhost:8082
+```
 
 ---
 
