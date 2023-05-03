@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+    libmedium:
+        image: realaravinth/libmedium
+        container_name: 'libmedium'
+        hostname: 'libmedium'
+        user: nobody
+        #read_only: true
+        restart: always
+        security_opt:
+        - no-new-privileges:true
+        cap_drop:
+        - ALL
+        cap_add:
+        - CHOWN
+        - SETGID
+        - SETUID
+        ports:
+            - '8082:7000'
+        volumes:
+            - './config/default.toml:/etc/libmedium/config.toml'
