@@ -6,7 +6,7 @@ services:
         container_name: 'libmedium'
         hostname: 'libmedium'
         user: nobody
-        #read_only: true
+        read_only: false
         restart: always
         security_opt:
         - no-new-privileges:true
