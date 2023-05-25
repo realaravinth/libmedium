@@ -58,6 +58,7 @@ business.
 | http://vernaqj2qr2pijpgvf3od6ssc3ulz3nv52gwr3hba5l6humuzmgq.b32.i2p/ | N/A | Hetzner | [~vern](https://vern.cc)
 | https://medium.hostux.net | France   | Gandi   | [hostux](https://hostux.net) |
 | https://md.xbdm.fun       | Germany  | Hetzner | Hosted by [xbdm](https://www.xbdm.fun)
+| https://libmedium.esmailelbob.xyz | Canada  | OVH | [Esmail EL BoB](https://esmailelbob.xyz)
 
 ## Deploy with Docker
 
