@@ -60,7 +60,7 @@ business.
 | https://medium.hostux.net                                                 | France  | Gandi             | [hostux](https://hostux.net)             |
 | https://md.xbdm.fun                                                       | Germany | Hetzner           | Hosted by [xbdm](https://www.xbdm.fun)   |
 | https://libmedium.fascinated.cc                                           | Germany | Behind Cloudflare | @RealFascinated                          |
-| https://libmedium.frontendfriendly.xyz                                    | US      | Hetzner           | [Team SDS](https://frontendfriendly.xyz) |
+| https://libmedium.frontendfriendly.xyz                                    | US      | Hetzner           | [Frontend Friendly](https://frontendfriendly.xyz) |
                |
 
 ## Deploy with Docker
