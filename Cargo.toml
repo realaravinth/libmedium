@@ -32,7 +32,7 @@ url = "2.2"
 
 [dependencies.graphql_client]
 features = ["reqwest"]
-version = "0.12.0"
+version = "0.13.0"
 
 [dependencies.actix-web-codegen-const-routes]
 git = "https://github.com/realaravinth/actix-web-codegen-const-routes"
