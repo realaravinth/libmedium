@@ -1,13 +1,13 @@
 [package]
 authors = ["realaravinth <realaravinth@batsense.net>"]
 build = "build.rs"
-documentation = "https://github.con/realaravinth/libmedium"
+documentation = "https://git.batsense.net/realaravinth/libmedium"
 edition = "2021"
-homepage = "https://github.com/realaravinth/libmedium"
+homepage = "https://git.batsense.net/realaravinth/libmedium"
 license = "AGPLv3 or later version"
 name = "libmedium"
-readme = "https://github.com/realaravinth/libmedium/blob/master/README.md"
-repository = "https://github.com/realaravinth/libmedium"
+readme = "https://git.batsense.net/realaravinth/libmedium/blob/master/README.md"
+repository = "https://git.batsense.net/realaravinth/libmedium"
 version = "0.1.0"
 
 [dependencies]
