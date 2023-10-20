@@ -107,14 +107,6 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
 </pre></div><pre class="rust"><code><span class="comment">/*
  * Copyright (C) 2021  Aravinth Manivannan &lt;realaravinth@batsense.net&gt;
  *
@@ -167,39 +159,35 @@
 <span class="attr">#[cfg(not(tarpaulin_include))]
 </span><span class="kw">impl </span>Settings {
     <span class="kw">pub fn </span>new() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ConfigError&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>s = Config::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>s = Config::builder();
 
         <span class="comment">// setting default values
-        </span><span class="attr">#[cfg(test)]
-        </span>s.set_default(<span class="string">&quot;database.pool&quot;</span>, <span class="number">2</span>.to_string())
-            .expect(<span class="string">&quot;Couldn&#39;t get the number of CPUs&quot;</span>);
-
-        <span class="kw">const </span>CURRENT_DIR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;./config/default.toml&quot;</span>;
+        </span><span class="kw">const </span>CURRENT_DIR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;./config/default.toml&quot;</span>;
         <span class="kw">const </span>ETC: <span class="kw-2">&amp;</span>str = <span class="string">&quot;/etc/libmedium/config.toml&quot;</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(path) = env::var(<span class="string">&quot;LIBMEDIUM&quot;</span>) {
-            s.merge(File::with_name(<span class="kw-2">&amp;</span>path))<span class="question-mark">?</span>;
+            s = s.add_source(File::with_name(<span class="kw-2">&amp;</span>path));
         } <span class="kw">else if </span>Path::new(CURRENT_DIR).exists() {
             <span class="comment">// merging default config from file
-            </span>s.merge(File::with_name(CURRENT_DIR))<span class="question-mark">?</span>;
+            </span>s = s.add_source(File::with_name(CURRENT_DIR));
         } <span class="kw">else if </span>Path::new(ETC).exists() {
-            s.merge(File::with_name(ETC))<span class="question-mark">?</span>;
+            s = s.add_source(File::with_name(ETC));
         } <span class="kw">else </span>{
             <span class="macro">log::warn!</span>(<span class="string">&quot;configuration file not found&quot;</span>);
         }
 
-        s.merge(Environment::with_prefix(<span class="string">&quot;PAGES&quot;</span>).separator(<span class="string">&quot;__&quot;</span>))<span class="question-mark">?</span>;
+        s = s.add_source(Environment::with_prefix(<span class="string">&quot;PAGES&quot;</span>).separator(<span class="string">&quot;__&quot;</span>));
 
-        check_url(<span class="kw-2">&amp;</span>s);
 
         <span class="kw">match </span>env::var(<span class="string">&quot;PORT&quot;</span>) {
             <span class="prelude-val">Ok</span>(val) =&gt; {
-                s.set(<span class="string">&quot;server.port&quot;</span>, val).unwrap();
+                s = s.set_override(<span class="string">&quot;server.port&quot;</span>, val).unwrap();
             }
             <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;couldn&#39;t interpret PORT: {}&quot;</span>, e),
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>settings: Settings = s.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>settings: Settings = s.build()<span class="question-mark">?</span>.try_deserialize::&lt;Settings&gt;()<span class="question-mark">?</span>;
+        settings.check_url();
 
         <span class="kw">if </span>settings.cache.is_none() {
             <span class="kw">let </span>tmp = env::temp_dir().join(<span class="string">&quot;libmedium_cache_path&quot;</span>);
@@ -222,14 +210,10 @@
         }
         <span class="prelude-val">Ok</span>(settings)
     }
-}
 
-<span class="attr">#[cfg(not(tarpaulin_include))]
-</span><span class="kw">fn </span>check_url(s: <span class="kw-2">&amp;</span>Config) {
-    <span class="kw">let </span>url = s
-        .get::&lt;String&gt;(<span class="string">&quot;source_code&quot;</span>)
-        .expect(<span class="string">&quot;Couldn&#39;t access source_code&quot;</span>);
-
-    Url::parse(<span class="kw-2">&amp;</span>url).expect(<span class="string">&quot;Please enter a URL for source_code in settings&quot;</span>);
+    <span class="attr">#[cfg(not(tarpaulin_include))]
+    </span><span class="kw">fn </span>check_url(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        Url::parse(<span class="kw-2">&amp;</span><span class="self">self</span>.source_code).expect(<span class="string">&quot;Please enter a URL for source_code in settings&quot;</span>);
+    }
 }
 </code></pre></div></section></main></body></html>
