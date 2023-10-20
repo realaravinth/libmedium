@@ -189,11 +189,18 @@ impl Data {
     }
 
     pub fn get_gist_id(url: &str) -> &str {
-        url.split('/').last().unwrap()
+        let mut id = url.split('/').last().unwrap();
+        id = if id.ends_with(".js") {
+            let splits: Vec<&str> = id.split(".js").collect();
+            splits.get(0).unwrap()
+        } else {
+            id
+        };
+        id
     }
 
     pub async fn get_gist(&self, gist_url: String) -> (String, GistContent) {
-        let id = Self::get_gist_id(&gist_url).to_owned();
+        let mut id = Self::get_gist_id(&gist_url).to_owned();
         let file_name = if gist_url.contains('?') {
             let parsed = url::Url::parse(&gist_url).unwrap();
             if let Some((_, file_name)) = parsed.query_pairs().find(|(k, _)| k == "file") {
@@ -211,6 +218,7 @@ impl Data {
                 const URL: &str = "https://api.github.com/gists/";
 
                 let url = format!("{}{}", URL, id);
+                println!("{url}");
 
                 let resp = self
                     .client
