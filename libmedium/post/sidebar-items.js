@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["PostitionType",""]],"fn":[["apply_markup",""]],"struct":[["ListState",""],["Markup",""],["PositionMap",""]]};
+window.SIDEBAR_ITEMS = {"enum":["PostitionType"],"fn":["apply_markup"],"struct":["ListState","Markup","PositionMap"]};

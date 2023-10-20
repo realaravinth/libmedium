@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["check_url",""]],"struct":[["Server",""],["Settings",""]]};
+window.SIDEBAR_ITEMS = {"fn":["check_url"],"struct":["Server","Settings"]};
