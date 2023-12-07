@@ -69,7 +69,6 @@ impl Settings {
 
         s = s.add_source(Environment::with_prefix("PAGES").separator("__"));
 
-
         match env::var("PORT") {
             Ok(val) => {
                 s = s.set_override("server.port", val).unwrap();

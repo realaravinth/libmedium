@@ -34,6 +34,7 @@ pub mod routes {
         pub by_post_id: &'static str,
         pub page: &'static str,
         pub asset: &'static str,
+        pub top_level_post: &'static str,
     }
 
     impl Proxy {
@@ -43,6 +44,7 @@ pub mod routes {
                 by_post_id: "/utils/post/{post}",
                 page: "/{username}/{post}",
                 asset: "/asset/medium/{name}",
+                top_level_post: "/{post}",
             }
         }
         pub fn get_page(&self, username: &str, post: &str) -> String {
@@ -167,6 +169,23 @@ async fn by_post_id(path: web::Path<String>, data: AppData) -> impl Responder {
         .finish()
 }
 
+#[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.top_level_post")]
+async fn by_top_level_post(path: web::Path<String>, data: AppData) -> impl Responder {
+    if let Some(post_id) = path.split('-').last() {
+        let post_data = data.get_post_light(post_id).await;
+        HttpResponse::Found()
+            .append_header((
+                header::LOCATION,
+                crate::V1_API_ROUTES
+                    .proxy
+                    .get_page(&post_data.username, &post_data.slug),
+            ))
+            .finish()
+    } else {
+        HttpResponse::NotFound().body("Post not found, please file bug report")
+    }
+}
+
 #[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.page")]
 async fn page(path: web::Path<(String, String)>, data: AppData) -> impl Responder {
     let post_id = path.1.split('-').last();
@@ -238,6 +257,7 @@ pub fn services(cfg: &mut web::ServiceConfig) {
     cfg.service(by_post_id);
     cfg.service(assets);
     cfg.service(page);
+    cfg.service(by_top_level_post);
     cfg.service(index);
 }
 
