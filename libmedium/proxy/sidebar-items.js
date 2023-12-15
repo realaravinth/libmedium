@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["CACHE_AGE","INDEX"],"fn":["services"],"mod":["routes"],"struct":["Post","assets","by_post_id","index","page"],"trait":["StringUtils"]};
+window.SIDEBAR_ITEMS = {"constant":["CACHE_AGE","INDEX"],"fn":["services"],"mod":["routes"],"struct":["Post","assets","by_post_id","by_top_level_post","index","page"],"trait":["StringUtils"]};
