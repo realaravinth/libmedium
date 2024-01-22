@@ -1,4 +1,4 @@
-pipeline:
+steps:
   backend:
     image: rust
     environment:
@@ -12,22 +12,32 @@ pipeline:
       - make
       - make test
 
-  build_docker_img:
-    image: plugins/docker
+  build-docker-img:
+    image: woodpeckerci/plugin-docker-buildx
     when:
       event: [pull_request]
+    secrets: [docker_token]
     settings:
       dry_run: true
       repo: realaravinth/libmedium
-      tags: latest
-
-  build_and_publish_docker_img:
-    image: plugins/docker
-    when:
-      event: [push, tag, deployment]
-    settings:
       username: realaravinth
       password:
         from_secret: DOCKER_TOKEN
+      platforms: linux/amd64,linux/arm64/v8
+      tag: latest
+
+
+  publish-docker-img:
+    image: woodpeckerci/plugin-docker-buildx
+    when:
+      event: [push, tag, deployment]
+      branch: master
+    secrets: [docker_token]
+    settings:
+      dry_run: true
       repo: realaravinth/libmedium
-      tags: latest
+      username: realaravinth
+      password:
+        from_secret: DOCKER_TOKEN
+      platforms: linux/amd64,linux/arm64/v8
+      tag: latest
