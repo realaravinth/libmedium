@@ -34,7 +34,6 @@ steps:
       branch: master
     secrets: [docker_token]
     settings:
-      dry_run: true
       repo: realaravinth/libmedium
       username: realaravinth
       password:
