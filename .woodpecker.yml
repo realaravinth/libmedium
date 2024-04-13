@@ -1,6 +1,8 @@
 steps:
   backend:
     image: rust
+    when:
+      event: [push, pull_request, tag, deployment, cron, manual, release]
     environment:
       - GIT_HASH=8e77345f1597e40c2e266cb4e6dee74888918a61 # dummy value
       - COMPILED_DATE=2021-07-21
@@ -16,13 +18,10 @@ steps:
     image: woodpeckerci/plugin-docker-buildx
     when:
       event: [pull_request]
-    secrets: [docker_token]
     settings:
       dry_run: true
       repo: realaravinth/libmedium
       username: realaravinth
-      password:
-        from_secret: DOCKER_TOKEN
       platforms: linux/amd64,linux/arm64/v8
       tag: latest
 
