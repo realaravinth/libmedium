@@ -38,7 +38,7 @@ pub struct SourcegraphQuery<'a> {
 }
 
 impl<'a> SourcegraphQuery<'a> {
-    pub fn syntax_highlight(&self) -> String {
+    pub fn syntax_highlight(&self, gist_name: &str) -> String {
         //    let ss = SYNTAX_SET;
         let ts = ThemeSet::load_defaults();
 
@@ -66,7 +66,8 @@ impl<'a> SourcegraphQuery<'a> {
                 if line_num == 0 || line_num == total_lines - 1 {
                     output.push_str(line);
                 } else {
-                    output.push_str(&format!("<div title='click for more options' id=\"line-{num}\"class=\"line\"><details class='line_links'><summary class='line_top-link'><a href=\"#line-{num}\"<span class=\"line-number\">{num}</span></a>{line}</summary><a href=\"#line-{num}\"<span class=\"line-link\">Permanant link</span></a><a href=\"#line-{num}\"<span class=\"line-link\">Highlight</span></a></details></div>"
+                    let line_id = format!("{gist_name}-{num}");
+                    output.push_str(&format!("<div title='click for more options' id=\"line-{line_id}\"class=\"line\"><details class='line_links'><summary class='line_top-link'><a href=\"#line-{line_id}\"<span class=\"line-number\">{num}</span></a>{line}</summary><a href=\"#line-{line_id}\"<span class=\"line-link\">Permanant link</span></a><a href=\"#line-{line_id}\"<span class=\"line-link\">Highlight</span></a></details></div>"
                     ));
                     num += 1;
                 }
@@ -153,7 +154,7 @@ mod tests {
         };
         let result = query.determine_language(&syntax_set);
         assert_eq!(result.name, "TeX");
-        let _result = query.syntax_highlight();
+        let _result = query.syntax_highlight("foo");
     }
 
     //#[test]
