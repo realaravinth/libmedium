@@ -21,6 +21,7 @@ use graphql_client::{reqwest::post_graphql, GraphQLQuery};
 use reqwest::header::USER_AGENT;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use sha256::digest;
 use sled::{Db, Tree};
 
 use crate::proxy::StringUtils;
@@ -287,19 +288,21 @@ impl Data {
                 filepath: &file.file_name,
                 code: &file.content,
             };
-            file.content = highlight.syntax_highlight();
+            file.content = highlight.syntax_highlight(&digest(&file.raw_url));
             files.push(file);
             GistContent {
                 files,
                 html_url: gist_url,
             }
         } else {
+            let mut index = 1;
             gist.files.iter_mut().for_each(|f| {
                 let highlight = render_html::SourcegraphQuery {
                     filepath: &f.file_name,
                     code: &f.content,
                 };
-                f.content = highlight.syntax_highlight();
+                f.content = highlight.syntax_highlight(&digest(&f.raw_url));
+                index += 1;
             });
             gist
         };

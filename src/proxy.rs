@@ -133,7 +133,7 @@ const INDEX: &str = include_str!("../templates/index.html");
 async fn index() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(INDEX)
+        .body(INDEX.replace("SOURCE_CODE_REPLACE", &crate::SETTINGS.source_code))
 }
 
 #[actix_web_codegen_const_routes::get(path = "crate::V1_API_ROUTES.proxy.asset")]

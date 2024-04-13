@@ -1,5 +1,5 @@
 debug = true
-source_code = "https://github.com/realaravinth/libmedium"
+source_code = "https://git.batsense.net/realaravinth/libmedium"
 #cache = "/var/lib/libmedium"
 
 [server]

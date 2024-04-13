@@ -30,6 +30,7 @@ sled = "0.34.7"
 syntect = "5.0.0"
 url = "2.2"
 actix-web-codegen-const-routes = "0.2.0"
+sha256 = "1.5.0"
 
 [dependencies.graphql_client]
 features = ["reqwest"]
