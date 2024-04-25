@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/proxy.rs`."><title>proxy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="libmedium" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../libmedium/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/proxy.rs`."><title>proxy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="libmedium" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../libmedium/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -344,31 +346,31 @@
 
 <span class="kw">pub mod </span>routes {
     <span class="kw">pub struct </span>Proxy {
-        <span class="kw">pub </span>index: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-        <span class="kw">pub </span>by_post_id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-        <span class="kw">pub </span>page: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-        <span class="kw">pub </span>asset: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-        <span class="kw">pub </span>top_level_post: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        <span class="kw">pub </span>index: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        <span class="kw">pub </span>by_post_id: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        <span class="kw">pub </span>page: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        <span class="kw">pub </span>asset: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        <span class="kw">pub </span>top_level_post: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
     }
 
     <span class="kw">impl </span>Proxy {
         <span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
             <span class="self">Self </span>{
-                index: <span class="string">&quot;/&quot;</span>,
-                by_post_id: <span class="string">&quot;/utils/post/{post}&quot;</span>,
-                page: <span class="string">&quot;/{username}/{post}&quot;</span>,
-                asset: <span class="string">&quot;/asset/medium/{name}&quot;</span>,
-                top_level_post: <span class="string">&quot;/{post}&quot;</span>,
+                index: <span class="string">"/"</span>,
+                by_post_id: <span class="string">"/utils/post/{post}"</span>,
+                page: <span class="string">"/{username}/{post}"</span>,
+                asset: <span class="string">"/asset/medium/{name}"</span>,
+                top_level_post: <span class="string">"/{post}"</span>,
             }
         }
         <span class="kw">pub fn </span>get_page(<span class="kw-2">&amp;</span><span class="self">self</span>, username: <span class="kw-2">&amp;</span>str, post: <span class="kw-2">&amp;</span>str) -&gt; String {
             <span class="self">self</span>.page
-                .replace(<span class="string">&quot;{username}&quot;</span>, username)
-                .replace(<span class="string">&quot;{post}&quot;</span>, post)
+                .replace(<span class="string">"{username}"</span>, username)
+                .replace(<span class="string">"{post}"</span>, post)
         }
 
         <span class="kw">pub fn </span>get_medium_asset(<span class="kw-2">&amp;</span><span class="self">self</span>, asset_name: <span class="kw-2">&amp;</span>str) -&gt; String {
-            <span class="self">self</span>.asset.replace(<span class="string">&quot;{name}&quot;</span>, asset_name)
+            <span class="self">self</span>.asset.replace(<span class="string">"{name}"</span>, asset_name)
         }
     }
 }
@@ -416,20 +418,20 @@
             Bound::Included(bound) | Bound::Excluded(bound) =&gt; <span class="kw-2">*</span>bound,
             Bound::Unbounded =&gt; <span class="number">0</span>,
         };
-        <span class="macro">log::debug!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>);
-        <span class="macro">log::debug!</span>(<span class="string">&quot;start: {start}&quot;</span>);
+        <span class="macro">log::debug!</span>(<span class="string">"{}"</span>, <span class="self">self</span>);
+        <span class="macro">log::debug!</span>(<span class="string">"start: {start}"</span>);
         <span class="kw">let </span>len = <span class="kw">match </span>range.end_bound() {
             Bound::Included(bound) =&gt; <span class="kw-2">*</span>bound + <span class="number">1</span>,
             Bound::Excluded(bound) =&gt; <span class="kw-2">*</span>bound,
             Bound::Unbounded =&gt; <span class="self">self</span>.len(),
         } - start;
-        <span class="macro">log::debug!</span>(<span class="string">&quot;len {len}&quot;</span>);
+        <span class="macro">log::debug!</span>(<span class="string">"len {len}"</span>);
         <span class="self">self</span>.substring(start, len)
     }
 }
 
 <span class="attr">#[derive(TemplateOnce)]
-#[template(path = <span class="string">&quot;post.html&quot;</span>)]
+#[template(path = <span class="string">"post.html"</span>)]
 #[template(rm_whitespace = <span class="bool-val">true</span>)]
 </span><span class="kw">pub struct </span>Post {
     <span class="kw">pub </span>data: PostResp,
@@ -441,20 +443,20 @@
     <span class="kw">pub </span>paragraphs: Vec&lt;String&gt;,
 }
 
-<span class="kw">const </span>INDEX: <span class="kw-2">&amp;</span>str = <span class="macro">include_str!</span>(<span class="string">&quot;../templates/index.html&quot;</span>);
+<span class="kw">const </span>INDEX: <span class="kw-2">&amp;</span>str = <span class="macro">include_str!</span>(<span class="string">"../templates/index.html"</span>);
 
-<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.index&quot;</span>)]
+<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">"crate::V1_API_ROUTES.proxy.index"</span>)]
 </span><span class="kw">async fn </span>index() -&gt; <span class="kw">impl </span>Responder {
     HttpResponse::Ok()
-        .content_type(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
-        .body(INDEX)
+        .content_type(<span class="string">"text/html; charset=utf-8"</span>)
+        .body(INDEX.replace(<span class="string">"SOURCE_CODE_REPLACE"</span>, <span class="kw-2">&amp;</span><span class="kw">crate</span>::SETTINGS.source_code))
 }
 
-<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.asset&quot;</span>)]
+<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">"crate::V1_API_ROUTES.proxy.asset"</span>)]
 </span><span class="kw">async fn </span>assets(path: web::Path&lt;String&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
     <span class="kw">let </span>res = data
         .client
-        .get(<span class="macro">format!</span>(<span class="string">&quot;https://miro.medium.com/{}&quot;</span>, path))
+        .get(<span class="macro">format!</span>(<span class="string">"https://miro.medium.com/{}"</span>, path))
         .send()
         .<span class="kw">await
         </span>.unwrap();
@@ -463,14 +465,14 @@
     HttpResponse::Ok()
         .insert_header(header::CacheControl(<span class="macro">vec!</span>[
             header::CacheDirective::Public,
-            header::CacheDirective::Extension(<span class="string">&quot;immutable&quot;</span>.into(), <span class="prelude-val">None</span>),
+            header::CacheDirective::Extension(<span class="string">"immutable"</span>.into(), <span class="prelude-val">None</span>),
             header::CacheDirective::MaxAge(CACHE_AGE),
         ]))
         .content_type(content_type)
         .body(res.bytes().<span class="kw">await</span>.unwrap())
 }
 
-<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.by_post_id&quot;</span>)]
+<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">"crate::V1_API_ROUTES.proxy.by_post_id"</span>)]
 </span><span class="kw">async fn </span>by_post_id(path: web::Path&lt;String&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
     <span class="kw">let </span>post_data = data.get_post_light(<span class="kw-2">&amp;</span>path).<span class="kw">await</span>;
     HttpResponse::Found()
@@ -483,9 +485,9 @@
         .finish()
 }
 
-<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.top_level_post&quot;</span>)]
+<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">"crate::V1_API_ROUTES.proxy.top_level_post"</span>)]
 </span><span class="kw">async fn </span>by_top_level_post(path: web::Path&lt;String&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(post_id) = path.split(<span class="string">&#39;-&#39;</span>).last() {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(post_id) = path.split(<span class="string">'-'</span>).last() {
         <span class="kw">let </span>post_data = data.get_post_light(post_id).<span class="kw">await</span>;
         HttpResponse::Found()
             .append_header((
@@ -496,13 +498,13 @@
             ))
             .finish()
     } <span class="kw">else </span>{
-        HttpResponse::NotFound().body(<span class="string">&quot;Post not found, please file bug report&quot;</span>)
+        HttpResponse::NotFound().body(<span class="string">"Post not found, please file bug report"</span>)
     }
 }
 
-<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">&quot;crate::V1_API_ROUTES.proxy.page&quot;</span>)]
+<span class="attr">#[actix_web_codegen_const_routes::get(path = <span class="string">"crate::V1_API_ROUTES.proxy.page"</span>)]
 </span><span class="kw">async fn </span>page(path: web::Path&lt;(String, String)&gt;, data: AppData) -&gt; <span class="kw">impl </span>Responder {
-    <span class="kw">let </span>post_id = path.<span class="number">1</span>.split(<span class="string">&#39;-&#39;</span>).last();
+    <span class="kw">let </span>post_id = path.<span class="number">1</span>.split(<span class="string">'-'</span>).last();
     <span class="kw">if </span>post_id.is_none() {
         <span class="kw">return </span>HttpResponse::BadRequest().finish();
     }
@@ -513,7 +515,7 @@
     <span class="kw">let </span>paragraphs = <span class="kw-2">&amp;</span>post_data.content.body_model.paragraphs;
 
     <span class="kw">for </span>p <span class="kw">in </span>paragraphs.iter() {
-        <span class="kw">if </span>p.type_ == <span class="string">&quot;IFRAME&quot; </span>{
+        <span class="kw">if </span>p.type_ == <span class="string">"IFRAME" </span>{
             <span class="kw">let </span>src = <span class="kw-2">&amp;</span>p
                 .iframe
                 .as_ref()
@@ -522,7 +524,7 @@
                 .as_ref()
                 .unwrap()
                 .href;
-            <span class="kw">if </span>src.contains(<span class="string">&quot;gist.github.com&quot;</span>) {
+            <span class="kw">if </span>src.contains(<span class="string">"gist.github.com"</span>) {
                 <span class="kw">let </span>fut = data.get_gist(src.to_owned());
                 futs.push(fut);
             }
@@ -537,7 +539,7 @@
 
     <span class="kw">let </span>date = Utc
         .timestamp_millis(post_data.created_at)
-        .format(<span class="string">&quot;%b %e, %Y&quot;</span>)
+        .format(<span class="string">"%b %e, %Y"</span>)
         .to_string();
     <span class="kw">let </span>reading_time = post_data.reading_time.floor() <span class="kw">as </span>usize;
     <span class="kw">let </span>preview_img = post_data
@@ -563,7 +565,7 @@
 
     <span class="kw">let </span>page = page.render_once().unwrap();
     HttpResponse::Ok()
-        .content_type(<span class="string">&quot;text/html; charset=utf-8&quot;</span>)
+        .content_type(<span class="string">"text/html; charset=utf-8"</span>)
         .body(page)
 }
 
@@ -587,10 +589,10 @@
         <span class="kw">let </span>data = Data::new();
         <span class="kw">let </span>app = test::init_service(App::new().app_data(data.clone()).configure(services)).<span class="kw">await</span>;
         <span class="kw">let </span>urls = <span class="macro">vec!</span>[
-            <span class="string">&quot;/@ftrain/big-data-small-effort-b62607a43a8c&quot;</span>,
-            <span class="string">&quot;/@shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8&quot;</span>,
-            <span class="string">&quot;/&quot;</span>,
-            <span class="string">&quot;/asset/medium/1*LY2ohYsNa9nOV1Clko3zJA.png&quot;</span>,
+            <span class="string">"/@ftrain/big-data-small-effort-b62607a43a8c"</span>,
+            <span class="string">"/@shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8"</span>,
+            <span class="string">"/"</span>,
+            <span class="string">"/asset/medium/1*LY2ohYsNa9nOV1Clko3zJA.png"</span>,
         ];
 
         <span class="kw">for </span>uri <span class="kw">in </span>urls.iter() {
@@ -600,14 +602,14 @@
         }
 
         <span class="kw">let </span>urls = <span class="macro">vec!</span>[
-            <span class="string">&quot;/ftrain/big-data-small-effort-b62607a43a8c&quot;</span>,
-            <span class="string">&quot;/shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8&quot;</span>,
+            <span class="string">"/ftrain/big-data-small-effort-b62607a43a8c"</span>,
+            <span class="string">"/shawn-shi/rest-api-best-practices-decouple-long-running-tasks-from-http-request-processing-9fab2921ace8"</span>,
         ];
 
         <span class="kw">for </span>uri <span class="kw">in </span>urls.iter() {
-            <span class="kw">let </span>id = uri.split(<span class="string">&#39;-&#39;</span>).last().unwrap();
+            <span class="kw">let </span>id = uri.split(<span class="string">'-'</span>).last().unwrap();
 
-            <span class="kw">let </span>page_url = <span class="kw">crate</span>::V1_API_ROUTES.proxy.by_post_id.replace(<span class="string">&quot;{post}&quot;</span>, id);
+            <span class="kw">let </span>page_url = <span class="kw">crate</span>::V1_API_ROUTES.proxy.by_post_id.replace(<span class="string">"{post}"</span>, id);
 
             <span class="kw">let </span>resp =
                 test::call_service(<span class="kw-2">&amp;</span>app, test::TestRequest::get().uri(<span class="kw-2">&amp;</span>page_url).to_request())
@@ -616,13 +618,13 @@
             <span class="kw">let </span>headers = resp.headers();
             <span class="macro">assert_eq!</span>(headers.get(header::LOCATION).unwrap(), uri);
 
-            <span class="kw">let </span>url = <span class="string">&quot;/@tylerneely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c&quot;</span>;
+            <span class="kw">let </span>url = <span class="string">"/@tylerneely/fear-and-loathing-in-lock-free-programming-7158b1cdd50c"</span>;
 
             <span class="kw">let </span>resp =
                 test::call_service(<span class="kw-2">&amp;</span>app, test::TestRequest::get().uri(url).to_request()).<span class="kw">await</span>;
             <span class="macro">assert_eq!</span>(resp.status(), StatusCode::OK);
             <span class="kw">let </span>res = String::from_utf8(test::read_body(resp).<span class="kw">await</span>.to_vec()).unwrap();
-            <span class="macro">assert!</span>(res.contains(<span class="macro">include_str!</span>(<span class="string">&quot;../tests/7158b1cdd50c.html&quot;</span>)));
+            <span class="macro">assert!</span>(res.contains(<span class="macro">include_str!</span>(<span class="string">"../tests/7158b1cdd50c.html"</span>)));
         }
     }
 }

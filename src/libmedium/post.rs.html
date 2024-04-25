@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/post.rs`."><title>post.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="libmedium" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../libmedium/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/post.rs`."><title>post.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="libmedium" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../libmedium/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -450,52 +452,52 @@
     in_oli: bool,
 }
 
-<span class="kw">struct </span>Markup&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-    markup: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GetPostPostContentBodyModelParagraphsMarkups,
-    p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GetPostPostContentBodyModelParagraphs,
+<span class="kw">struct </span>Markup&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
+    markup: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>GetPostPostContentBodyModelParagraphsMarkups,
+    p: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>GetPostPostContentBodyModelParagraphs,
     pos_type: PostitionType,
-    gists: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
+    gists: <span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Markup&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; Markup&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
     <span class="kw">fn </span>start(
         p: <span class="kw-2">&amp;</span>GetPostPostContentBodyModelParagraphs,
-        gists: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
+        gists: <span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="prelude-ty">Option</span>&lt;Vec&lt;(String, <span class="kw">crate</span>::data::GistContent)&gt;&gt;,
         pindex: usize,
         state: <span class="kw-2">&amp;mut </span>ListState,
     ) -&gt; String {
         <span class="kw">let </span>list = <span class="self">Self</span>::list_close(p, state);
-        <span class="kw">let </span>resp = <span class="kw">if </span>p.type_ == <span class="string">&quot;IMG&quot; </span>{
+        <span class="kw">let </span>resp = <span class="kw">if </span>p.type_ == <span class="string">"IMG" </span>{
             <span class="kw">let </span>metadata = p.metadata.as_ref().unwrap();
             <span class="macro">format!</span>(
-                <span class="string">r#&quot;&lt;figure&gt;&lt;img width=&quot;{}&quot; src=&quot;{}&quot; /&gt; &lt;figcaption&gt;&quot;#</span>,
+                <span class="string">r#"&lt;figure&gt;&lt;img width="{}" src="{}" /&gt; &lt;figcaption&gt;"#</span>,
                 metadata.original_width.as_ref().unwrap(),
                 <span class="kw">crate</span>::V1_API_ROUTES.proxy.get_medium_asset(<span class="kw-2">&amp;</span>metadata.id)
             )
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;P&quot; </span>{
-            <span class="string">&quot;&lt;p&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;PRE&quot; </span>{
-            <span class="string">&quot;&lt;pre&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;BQ&quot; </span>|| p.type_ == <span class="string">&quot;PQ&quot; </span>{
-            <span class="string">&quot;&lt;blockquote&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H1&quot; </span>{
-            <span class="string">&quot;&lt;h1&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H2&quot; </span>{
-            <span class="string">&quot;&lt;h2&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H3&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">"P" </span>{
+            <span class="string">"&lt;p&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"PRE" </span>{
+            <span class="string">"&lt;pre&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"BQ" </span>|| p.type_ == <span class="string">"PQ" </span>{
+            <span class="string">"&lt;blockquote&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H1" </span>{
+            <span class="string">"&lt;h1&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H2" </span>{
+            <span class="string">"&lt;h2&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H3" </span>{
             <span class="kw">if </span>pindex == <span class="number">0 </span>{
-                <span class="macro">log::debug!</span>(<span class="string">&quot;caught heading&quot;</span>);
-                <span class="string">&quot;&quot;</span>.into()
+                <span class="macro">log::debug!</span>(<span class="string">"caught heading"</span>);
+                <span class="string">""</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;h3&gt;&quot;</span>.into()
+                <span class="string">"&lt;h3&gt;"</span>.into()
             }
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H4&quot; </span>{
-            <span class="string">&quot;&lt;h4&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H5&quot; </span>{
-            <span class="string">&quot;&lt;h5&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H6&quot; </span>{
-            <span class="string">&quot;&lt;h6&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;IFRAME&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H4" </span>{
+            <span class="string">"&lt;h4&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H5" </span>{
+            <span class="string">"&lt;h5&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H6" </span>{
+            <span class="string">"&lt;h6&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"IFRAME" </span>{
             <span class="kw">let </span>src = <span class="kw-2">&amp;</span>p
                 .iframe
                 .as_ref()
@@ -504,7 +506,7 @@
                 .as_ref()
                 .unwrap()
                 .href;
-            <span class="kw">if </span>src.contains(<span class="string">&quot;gist.github.com&quot;</span>) {
+            <span class="kw">if </span>src.contains(<span class="string">"gist.github.com"</span>) {
                 <span class="kw">let </span>gist_id = <span class="kw">crate</span>::data::Data::get_gist_id(src);
                 <span class="kw">let </span>(<span class="kw">_</span>, gist) = gists
                     .as_ref()
@@ -517,54 +519,54 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>gists = String::default();
                 <span class="kw">for </span>file <span class="kw">in </span><span class="kw-2">&amp;</span>gist.files {
                     gists += <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                        <span class="string">r#&quot;&lt;div class=&quot;code-block gist-block&quot;&gt;{}&lt;/div&gt;&quot;#</span>,
+                        <span class="string">r#"&lt;div class="code-block gist-block"&gt;{}&lt;/div&gt;"#</span>,
                         file.get_html_content()
                     );
                 }
                 <span class="macro">format!</span>(
-                    <span class="string">r#&quot;&lt;div class=&quot;gist_container&quot;&gt;{gists}
-                     &lt;a class=&quot;gist_link&quot; href=&quot;{}&quot; target=&quot;_blank&quot;&gt;See gist on GitHub&lt;/a&gt;&quot;#</span>,
+                    <span class="string">r#"&lt;div class="gist_container"&gt;{gists}
+                     &lt;a class="gist_link" href="{}" target="_blank"&gt;See gist on GitHub&lt;/a&gt;"#</span>,
                     <span class="kw-2">&amp;</span>gist.html_url
                 )
             } <span class="kw">else </span>{
-                <span class="macro">format!</span>(<span class="string">r#&quot;&lt;iframe src=&quot;{src}&quot; frameborder=&quot;0&quot;&gt;&quot;#</span>)
+                <span class="macro">format!</span>(<span class="string">r#"&lt;iframe src="{src}" frameborder="0"&gt;"#</span>)
             }
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;ULI&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">"ULI" </span>{
             <span class="kw">if </span>state.in_uli {
-                <span class="string">&quot;&lt;li&gt;&quot;</span>.into()
+                <span class="string">"&lt;li&gt;"</span>.into()
             } <span class="kw">else </span>{
                 state.in_uli = <span class="bool-val">true</span>;
-                <span class="string">&quot;&lt;ul&gt;&lt;li&gt;&quot;</span>.into()
+                <span class="string">"&lt;ul&gt;&lt;li&gt;"</span>.into()
             }
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;OLI&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">"OLI" </span>{
             <span class="kw">if </span>state.in_oli {
-                <span class="string">&quot;&lt;li&gt;&quot;</span>.into()
+                <span class="string">"&lt;li&gt;"</span>.into()
             } <span class="kw">else </span>{
                 state.in_oli = <span class="bool-val">true</span>;
-                <span class="string">&quot;&lt;ol&gt;&lt;li&gt;&quot;</span>.into()
+                <span class="string">"&lt;ol&gt;&lt;li&gt;"</span>.into()
             }
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;MIXTAPE_EMBED&quot; </span>{
-            <span class="string">&quot;&lt;div class=&#39;mixtape&#39;&gt;&lt;p&gt;&quot;</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"MIXTAPE_EMBED" </span>{
+            <span class="string">"&lt;div class='mixtape'&gt;&lt;p&gt;"</span>.into()
         } <span class="kw">else </span>{
-            <span class="macro">log::info!</span>(<span class="string">&quot;Unknown type: {}&quot;</span>, p.type_);
-            <span class="string">r#&quot;
-                &lt;p class=&quot;libmedium__meta&quot;&gt;
+            <span class="macro">log::info!</span>(<span class="string">"Unknown type: {}"</span>, p.type_);
+            <span class="string">r#"
+                &lt;p class="libmedium__meta"&gt;
                     &lt;b&gt;From LibMedium:&lt;/b&gt; LibMedium is built by reverse
-                    engineering the Meduim&#39;s internal API. This post contains
+                    engineering the Meduim's internal API. This post contains
                     markup(formatting rules) that we are unaware of.
                     Please report this URL &lt;a
-                    href=&quot;https://github.com/realaravinth/libmedium/issues/1&quot;
-                    rel=&quot;noreferrer&quot;&gt;on our bug tracker&lt;/a&gt; so that we can
+                    href="https://github.com/realaravinth/libmedium/issues/1"
+                    rel="noreferrer"&gt;on our bug tracker&lt;/a&gt; so that we can
                     improve page rendering.
                     &lt;br /&gt;
                     Alternatively, you can also email me at realaravinth at batsense dot net!
                   &lt;/p&gt;
-            &lt;span&gt;&quot;#
+            &lt;span&gt;"#
                 </span>.into()
         };
 
         <span class="kw">match </span>list {
-            <span class="prelude-val">Some</span>(list) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{list}{resp}&quot;</span>),
+            <span class="prelude-val">Some</span>(list) =&gt; <span class="macro">format!</span>(<span class="string">"{list}{resp}"</span>),
             <span class="prelude-val">None </span>=&gt; resp,
         }
     }
@@ -574,32 +576,32 @@
         pindex: usize,
         state: <span class="kw-2">&amp;mut </span>ListState,
     ) -&gt; String {
-        <span class="kw">let </span>resp: String = <span class="kw">if </span>p.type_ == <span class="string">&quot;IMG&quot; </span>{
-            <span class="string">&quot;&lt;/figcaption&gt;&lt;/figure&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;P&quot; </span>{
-            <span class="string">&quot;&lt;/p&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;PRE&quot; </span>{
-            <span class="string">&quot;&lt;/pre&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;BQ&quot; </span>|| p.type_ == <span class="string">&quot;PQ&quot; </span>{
-            <span class="string">&quot;&lt;/blockquote&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H1&quot; </span>{
-            <span class="string">&quot;&lt;/h1&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H2&quot; </span>{
-            <span class="string">&quot;&lt;/h2&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H3&quot; </span>{
+        <span class="kw">let </span>resp: String = <span class="kw">if </span>p.type_ == <span class="string">"IMG" </span>{
+            <span class="string">"&lt;/figcaption&gt;&lt;/figure&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"P" </span>{
+            <span class="string">"&lt;/p&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"PRE" </span>{
+            <span class="string">"&lt;/pre&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"BQ" </span>|| p.type_ == <span class="string">"PQ" </span>{
+            <span class="string">"&lt;/blockquote&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H1" </span>{
+            <span class="string">"&lt;/h1&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H2" </span>{
+            <span class="string">"&lt;/h2&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H3" </span>{
             <span class="kw">if </span>pindex == <span class="number">0 </span>{
-                <span class="macro">log::debug!</span>(<span class="string">&quot;caught heading&quot;</span>);
-                <span class="string">&quot;&quot;</span>.into()
+                <span class="macro">log::debug!</span>(<span class="string">"caught heading"</span>);
+                <span class="string">""</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/h3&gt;&quot;</span>.into()
+                <span class="string">"&lt;/h3&gt;"</span>.into()
             }
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H4&quot; </span>{
-            <span class="string">&quot;&lt;/h4&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H5&quot; </span>{
-            <span class="string">&quot;&lt;/h5&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;H6&quot; </span>{
-            <span class="string">&quot;&lt;/h6&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;IFRAME&quot; </span>{
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H4" </span>{
+            <span class="string">"&lt;/h4&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H5" </span>{
+            <span class="string">"&lt;/h5&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"H6" </span>{
+            <span class="string">"&lt;/h6&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"IFRAME" </span>{
             <span class="kw">let </span>src = <span class="kw-2">&amp;</span>p
                 .iframe
                 .as_ref()
@@ -608,29 +610,29 @@
                 .as_ref()
                 .unwrap()
                 .href;
-            <span class="kw">if </span>src.contains(<span class="string">&quot;gist.github.com&quot;</span>) {
-                <span class="string">&quot;&lt;/div&gt;&quot;</span>.into()
+            <span class="kw">if </span>src.contains(<span class="string">"gist.github.com"</span>) {
+                <span class="string">"&lt;/div&gt;"</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/iframe&gt;&quot;</span>.into()
+                <span class="string">"&lt;/iframe&gt;"</span>.into()
             }
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;OLI&quot; </span>|| p.type_ == <span class="string">&quot;ULI&quot; </span>{
-            <span class="string">&quot;&lt;/li&gt;&quot;</span>.into()
-        } <span class="kw">else if </span>p.type_ == <span class="string">&quot;MIXTAPE_EMBED&quot; </span>{
-            <span class="string">&quot;&lt;/p&gt;&lt;/div&gt;&quot;</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"OLI" </span>|| p.type_ == <span class="string">"ULI" </span>{
+            <span class="string">"&lt;/li&gt;"</span>.into()
+        } <span class="kw">else if </span>p.type_ == <span class="string">"MIXTAPE_EMBED" </span>{
+            <span class="string">"&lt;/p&gt;&lt;/div&gt;"</span>.into()
         } <span class="kw">else </span>{
-            <span class="string">&quot;&lt;/span&gt;&quot;</span>.into()
+            <span class="string">"&lt;/span&gt;"</span>.into()
         };
         <span class="kw">if </span>state.in_oli {
-            <span class="kw">if </span>p.type_ != <span class="string">&quot;OLI&quot; </span>{
+            <span class="kw">if </span>p.type_ != <span class="string">"OLI" </span>{
                 state.in_oli = <span class="bool-val">false</span>;
-                <span class="macro">format!</span>(<span class="string">&quot;&lt;/ol&gt;{resp}&quot;</span>)
+                <span class="macro">format!</span>(<span class="string">"&lt;/ol&gt;{resp}"</span>)
             } <span class="kw">else </span>{
                 resp
             }
         } <span class="kw">else if </span>state.in_uli {
-            <span class="kw">if </span>p.type_ != <span class="string">&quot;ULI&quot; </span>{
+            <span class="kw">if </span>p.type_ != <span class="string">"ULI" </span>{
                 state.in_uli = <span class="bool-val">false</span>;
-                <span class="macro">format!</span>(<span class="string">&quot;&lt;/ul&gt;{resp}&quot;</span>)
+                <span class="macro">format!</span>(<span class="string">"&lt;/ul&gt;{resp}"</span>)
             } <span class="kw">else </span>{
                 resp
             }
@@ -643,111 +645,111 @@
         p: <span class="kw-2">&amp;</span>GetPostPostContentBodyModelParagraphs,
         state: <span class="kw-2">&amp;mut </span>ListState,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">if </span>state.in_oli &amp;&amp; p.type_ != <span class="string">&quot;OLI&quot; </span>{
+        <span class="kw">if </span>state.in_oli &amp;&amp; p.type_ != <span class="string">"OLI" </span>{
             state.in_oli = <span class="bool-val">false</span>;
-            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="string">&quot;&lt;/ol&gt;&quot;</span>.to_string());
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="string">"&lt;/ol&gt;"</span>.to_string());
         };
-        <span class="kw">if </span>state.in_uli &amp;&amp; p.type_ != <span class="string">&quot;ULI&quot; </span>{
+        <span class="kw">if </span>state.in_uli &amp;&amp; p.type_ != <span class="string">"ULI" </span>{
             state.in_uli = <span class="bool-val">false</span>;
-            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="string">&quot;&lt;/ul&gt;&quot;</span>.to_string());
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="string">"&lt;/ul&gt;"</span>.to_string());
         };
         <span class="prelude-val">None
     </span>}
 
     <span class="kw">fn </span>apply_markup(<span class="kw-2">&amp;</span><span class="self">self</span>, _pindex: usize) -&gt; String {
-        <span class="kw">if </span><span class="self">self</span>.markup.type_ == <span class="string">&quot;A&quot; </span>{
+        <span class="kw">if </span><span class="self">self</span>.markup.type_ == <span class="string">"A" </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(anchor_type) = <span class="kw-2">&amp;</span><span class="self">self</span>.markup.anchor_type {
-                <span class="kw">if </span>anchor_type == <span class="string">&quot;LINK&quot; </span>{
+                <span class="kw">if </span>anchor_type == <span class="string">"LINK" </span>{
                     <span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
                         <span class="macro">format!</span>(
-                            <span class="string">r#&quot;&lt;a rel=&quot;noreferrer&quot; href=&quot;{}&quot;&gt;&quot;#</span>,
+                            <span class="string">r#"&lt;a rel="noreferrer" href="{}"&gt;"#</span>,
                             <span class="self">self</span>.markup.href.as_ref().unwrap()
                         )
                     } <span class="kw">else </span>{
-                        <span class="string">&quot;&lt;/a&gt;&quot;</span>.into()
+                        <span class="string">"&lt;/a&gt;"</span>.into()
                     }
-                } <span class="kw">else if </span>anchor_type == <span class="string">&quot;USER&quot; </span>{
+                } <span class="kw">else if </span>anchor_type == <span class="string">"USER" </span>{
                     <span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
                         <span class="macro">format!</span>(
-                            <span class="string">r#&quot;&lt;a rel=&quot;noreferrer&quot; href=&quot;https://medium.com/u/{}&quot;&gt;&quot;#</span>,
+                            <span class="string">r#"&lt;a rel="noreferrer" href="https://medium.com/u/{}"&gt;"#</span>,
                             <span class="self">self</span>.markup.user_id.as_ref().unwrap()
                         )
                     } <span class="kw">else </span>{
-                        <span class="string">&quot;&lt;/a&gt;&quot;</span>.into()
+                        <span class="string">"&lt;/a&gt;"</span>.into()
                     }
                 } <span class="kw">else </span>{
-                    <span class="comment">//             log::error!(&quot;unknown markup.anchor_type: {:?} post id {}&quot;, anchor_type, id);
+                    <span class="comment">//             log::error!("unknown markup.anchor_type: {:?} post id {}", anchor_type, id);
                     </span><span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                        <span class="string">&quot;&lt;span&gt;&quot;</span>.into()
+                        <span class="string">"&lt;span&gt;"</span>.into()
                     } <span class="kw">else </span>{
-                        <span class="string">&quot;&lt;/span&gt;&quot;</span>.into()
+                        <span class="string">"&lt;/span&gt;"</span>.into()
                     }
                 }
             } <span class="kw">else </span>{
-                <span class="comment">//             log::error!(&quot;unknown markup.anchor_type: {:?} post id {}&quot;, anchor_type, id);
+                <span class="comment">//             log::error!("unknown markup.anchor_type: {:?} post id {}", anchor_type, id);
                 </span><span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                    <span class="string">&quot;&lt;span&gt;&quot;</span>.into()
+                    <span class="string">"&lt;span&gt;"</span>.into()
                 } <span class="kw">else </span>{
-                    <span class="string">&quot;&lt;/span&gt;&quot;</span>.into()
+                    <span class="string">"&lt;/span&gt;"</span>.into()
                 }
             }
-        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">&quot;PRE&quot; </span>{
+        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">"PRE" </span>{
             <span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                <span class="string">&quot;&lt;pre&gt;&quot;</span>.into()
+                <span class="string">"&lt;pre&gt;"</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/pre&gt;&quot;</span>.into()
+                <span class="string">"&lt;/pre&gt;"</span>.into()
             }
-        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">&quot;EM&quot; </span>{
+        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">"EM" </span>{
             <span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                <span class="string">&quot;&lt;em&gt;&quot;</span>.into()
+                <span class="string">"&lt;em&gt;"</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/em&gt;&quot;</span>.into()
+                <span class="string">"&lt;/em&gt;"</span>.into()
             }
-        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">&quot;STRONG&quot; </span>{
+        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">"STRONG" </span>{
             <span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                <span class="string">&quot;&lt;strong&gt;&quot;</span>.into()
+                <span class="string">"&lt;strong&gt;"</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/strong&gt;&quot;</span>.into()
+                <span class="string">"&lt;/strong&gt;"</span>.into()
             }
-        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">&quot;CODE&quot; </span>{
+        } <span class="kw">else if </span><span class="self">self</span>.markup.type_ == <span class="string">"CODE" </span>{
             <span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                <span class="string">&quot;&lt;code&gt;&quot;</span>.into()
+                <span class="string">"&lt;code&gt;"</span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/code&gt;&quot;</span>.into()
+                <span class="string">"&lt;/code&gt;"</span>.into()
             }
         } <span class="kw">else </span>{
-            <span class="comment">// log::error!(&quot;unknown markup.type_: {:?} post id {}&quot;, markup.type_, id);
+            <span class="comment">// log::error!("unknown markup.type_: {:?} post id {}", markup.type_, id);
             </span><span class="kw">if </span><span class="self">self</span>.pos_type == PostitionType::Start {
-                <span class="macro">log::info!</span>(<span class="string">&quot;Unknown type&quot;</span>);
-                <span class="string">r#&quot;
-                &lt;p class=&quot;libmedium__meta&quot;&gt;
+                <span class="macro">log::info!</span>(<span class="string">"Unknown type"</span>);
+                <span class="string">r#"
+                &lt;p class="libmedium__meta"&gt;
                     &lt;b&gt;From LibMedium:&lt;/b&gt; LibMedium is built by reverse
-                    engineering the Meduim&#39;s internal API. This post contains
+                    engineering the Meduim's internal API. This post contains
                     markup(formatting rules) that we are unaware of.
                     Please report this URL &lt;a
-                    href=&quot;https://github.com/realaravinth/libmedium/issues/1&quot;
-                    rel=&quot;noreferrer&quot;&gt;on our bug tracker&lt;/a&gt; so that we can
+                    href="https://github.com/realaravinth/libmedium/issues/1"
+                    rel="noreferrer"&gt;on our bug tracker&lt;/a&gt; so that we can
                     improve page rendering.
                     &lt;br /&gt;
                     Alternatively, you can also email me at realaravinth at batsense dot net!
                   &lt;/p&gt;
-            &lt;span&gt;&quot;#
+            &lt;span&gt;"#
                     </span>.into()
             } <span class="kw">else </span>{
-                <span class="string">&quot;&lt;/span&gt;&quot;</span>.into()
+                <span class="string">"&lt;/span&gt;"</span>.into()
             }
         }
     }
 }
 
 <span class="attr">#[derive(Default)]
-</span><span class="kw">struct </span>PositionMap&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-    map: HashMap&lt;i64, Vec&lt;Markup&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;&gt;&gt;,
+</span><span class="kw">struct </span>PositionMap&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
+    map: HashMap&lt;i64, Vec&lt;Markup&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt;&gt;&gt;,
     arr: Vec&lt;i64&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; PositionMap&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">fn </span>insert_if_not_exists(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos: i64, m: Markup&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;) {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; PositionMap&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
+    <span class="kw">fn </span>insert_if_not_exists(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos: i64, m: Markup&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt;) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(markups) = <span class="self">self</span>.map.get_mut(<span class="kw-2">&amp;</span>pos) {
             markups.push(m);
         } <span class="kw">else </span>{
@@ -765,8 +767,8 @@
     <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
     <span class="kw">for </span>(pindex, p) <span class="kw">in </span>data.content.body_model.paragraphs.iter().enumerate() {
         <span class="kw">let </span><span class="kw-2">mut </span>pos = PositionMap::default();
-        <span class="kw">if </span>p.type_ == <span class="string">&quot;H3&quot; </span>&amp;&amp; pindex == <span class="number">0 </span>{
-            <span class="macro">log::debug!</span>(<span class="string">&quot;FOUND TOP LEVEL H3. Breaking&quot;</span>);
+        <span class="kw">if </span>p.type_ == <span class="string">"H3" </span>&amp;&amp; pindex == <span class="number">0 </span>{
+            <span class="macro">log::debug!</span>(<span class="string">"FOUND TOP LEVEL H3. Breaking"</span>);
             <span class="kw">continue</span>;
         }
         <span class="kw">for </span>m <span class="kw">in </span>p.markups.iter() {
@@ -793,7 +795,7 @@
             <span class="kw">let </span>incr = point <span class="kw">as </span>usize - cur;
             <span class="kw">let </span>post_incr = cur + incr;
             <span class="macro">log::debug!</span>(
-                <span class="string">&quot;cur before incr: {cur}, incr by: {}, post incr: {}&quot;</span>,
+                <span class="string">"cur before incr: {cur}, incr by: {}, post incr: {}"</span>,
                 incr,
                 post_incr
             );
@@ -822,11 +824,11 @@
                 }
                 cur = incr_cur(cur, <span class="kw-2">*</span>point);
             }
-            <span class="macro">log::debug!</span>(<span class="string">&quot;LAST&quot;</span>);
+            <span class="macro">log::debug!</span>(<span class="string">"LAST"</span>);
             content += p.text.slice(cur..);
             content += <span class="kw-2">&amp;</span>Markup::end(p, pindex, <span class="kw-2">&amp;mut </span>state);
         } <span class="kw">else </span>{
-            <span class="macro">log::debug!</span>(<span class="string">&quot;LAST WITH NO MARKUP&quot;</span>);
+            <span class="macro">log::debug!</span>(<span class="string">"LAST WITH NO MARKUP"</span>);
             content += p.text.slice(cur..);
             content += <span class="kw-2">&amp;</span>Markup::end(p, pindex, <span class="kw-2">&amp;mut </span>state);
         }
