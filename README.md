@@ -58,7 +58,7 @@ business.
 | http://vernaqj2qr2pijpgvf3od6ssc3ulz3nv52gwr3hba5l6humuzmgq.b32.i2p/      | N/A     | Hetzner    | [~vern](https://vern.cc)               |
 | https://medium.hostux.net                                                 | France  | Gandi      | [hostux](https://hostux.net)           |
 | https://read.sudovanilla.com                                              | US      | Cloudflare | [SudoVanilla](https://sudovanilla.com) |
-
+| https://libmedium.ducks.party                                             | DE      | Datalix    | [ducks.party](https://ducks.party)     |
 ## Deploy
 
 1. Grab [`./config/default.toml`](./config/default.toml) and make
