@@ -345,6 +345,7 @@ pub fn apply_markup(
 ) -> Vec<String> {
     let mut paragraphs: Vec<String> = Vec::with_capacity(data.content.body_model.paragraphs.len());
     let mut state = ListState::default();
+    let mut no_render_html = false;
     for (pindex, p) in data.content.body_model.paragraphs.iter().enumerate() {
         let mut pos = PositionMap::default();
         if p.type_ == "H3" && pindex == 0 {
@@ -383,33 +384,42 @@ pub fn apply_markup(
         }
 
         let mut content = String::with_capacity(p.text.len());
-        content += &Markup::start(p, gists, pindex, &mut state);
+        let start = &Markup::start(p, gists, pindex, &mut state);
+        content += start;
+        if start == "<pre>" {
+            no_render_html = true;
+        }
         pos.arr.sort();
+        let mut page = String::default();
         if let Some(first) = pos.arr.first() {
-            //content += p.text.substring(cur, *first as usize);
-            content += p.text.slice(cur..*first as usize);
+            page += p.text.slice(cur..*first as usize);
             cur = incr_cur(cur, *first);
             for point in pos.arr.iter() {
-                //content.push(p.text.substring(start, start + point);
-                //            if *point != 0 {
-
                 if cur != *point as usize {
-                    //           content += p.text.substring(cur, *point as usize);
-                    content += p.text.slice(cur..*point as usize);
+                    page += p.text.slice(cur..*point as usize);
                 }
                 //           }
                 let pos_markups = pos.map.get(point).unwrap();
                 for m in pos_markups.iter() {
-                    content += &m.apply_markup(pindex);
+                    page += &m.apply_markup(pindex);
                 }
                 cur = incr_cur(cur, *point);
             }
             log::debug!("LAST");
-            content += p.text.slice(cur..);
-            content += &Markup::end(p, pindex, &mut state);
+            page += p.text.slice(cur..);
+            let end = &Markup::end(p, pindex, &mut state);
+            if end == "</pre>" {
+                no_render_html = false;
+            }
+            content += &page;
+            content += end;
         } else {
             log::debug!("LAST WITH NO MARKUP");
-            content += p.text.slice(cur..);
+            page += p.text.slice(cur..);
+            if no_render_html {
+                page = page.replace("<", "&lt;").replace(">", "&gt;");
+            }
+            content += &page;
             content += &Markup::end(p, pindex, &mut state);
         }
         paragraphs.push(content);
